@@ -1,18 +1,19 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import Button from "./Button";
 
 const Header = () => {
   return (
-    <div>
+    <div className="bg-orange-300">
       <nav>
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/about">About</Link>
-          </li>
-        </ul>
+        <div className="flex">
+          <Link to="/" className="hover:bg-orange-500">
+            <Button label="Home" />
+          </Link>
+          <Link to="/about" className="hover:bg-orange-500 ml-4">
+            <Button label="About" />
+          </Link>
+        </div>
       </nav>
     </div>
   );
