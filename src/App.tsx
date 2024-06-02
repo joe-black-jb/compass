@@ -2,11 +2,11 @@ import React from "react";
 import { Routes, Route, Outlet, Link } from "react-router-dom";
 import logo from "./logo.svg";
 import "./App.css";
-import Layout from "./components/Layout";
-import Home from "./components/Home";
+import Layout from "./pages/Layout";
+import Home from "./pages/Home";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import About from "./components/About";
+import About from "./pages/About";
 
 function App() {
   return (
