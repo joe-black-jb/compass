@@ -41,3 +41,7 @@ export const getTitlesFamily = (
   });
   return titleFamily;
 };
+
+export const wait = (ms: number) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
