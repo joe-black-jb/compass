@@ -17,9 +17,7 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
 });
-// console.log("api: ", api);
 api.interceptors.request.use((req) => {
-  console.log("リクエスト内容🐶: ", req);
   return req;
 });
 
