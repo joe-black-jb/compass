@@ -40,3 +40,8 @@ export interface TitleFamily {
   parent: string;
   child: Title[];
 }
+
+export interface ValueObj {
+  titleId: string;
+  value: string;
+}
