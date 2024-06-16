@@ -1,8 +1,12 @@
-import React from "react";
+import React, { FC, ReactNode } from "react";
 import { Outlet, Link } from "react-router-dom";
 
-const Layout = () => {
-  return <div>Layout</div>;
+type Props = {
+  children: ReactNode;
+};
+
+const Layout: FC<Props> = ({ children }) => {
+  return <div>{children}</div>;
 };
 
 export default Layout;
