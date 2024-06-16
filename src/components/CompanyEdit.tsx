@@ -1,11 +1,11 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Company, Title, TitleFamily } from "../types/types";
+import { Company, Title, TitleFamily, ValueObj } from "../types/types";
 import api from "../api/axiosConfig";
 import { AxiosResponse } from "axios";
 import { useNavigate } from "react-router-dom";
-import { getTitlesByDepth, getTitlesFamily } from "../utils/funcs";
+import { getTitlesByDepth, getTitlesFamily, wait } from "../utils/funcs";
 import Button from "./Button";
 import TitleFormTable from "./TitleFormTable";
 
@@ -19,9 +19,11 @@ const CompanyEdit = () => {
   useEffect(() => {
     getCompany();
   }, []);
+  useEffect(() => {
+    setValueObjs();
+  }, [company]);
   const getCompany = () => {
     api.get(`/company/${companyId}/titles`).then((result: AxiosResponse) => {
-      console.log("会社情報: ", result.data);
       if (result.data) {
         setCompany(result.data);
       }
@@ -70,6 +72,75 @@ const CompanyEdit = () => {
     netAssetsFamily = getTitlesFamily(parentNetAssets, childNetAssets);
   }
 
+  const [values, setValues] = useState<ValueObj[]>([]);
+  const setValueObjs = () => {
+    const valueArray: ValueObj[] = [];
+    assetsFamily.forEach((parent) => {
+      parent.child.forEach((child) => {
+        const valueObj = {
+          titleId: child.ID.toString(),
+          value: child.Value || "N/A",
+        };
+        valueArray.push(valueObj);
+      });
+    });
+    liabilitiesFamily.forEach((parent) => {
+      parent.child.forEach((child) => {
+        const valueObj = {
+          titleId: child.ID.toString(),
+          value: child.Value || "N/A",
+        };
+        valueArray.push(valueObj);
+      });
+    });
+    netAssetsFamily.forEach((parent) => {
+      parent.child.forEach((child) => {
+        const valueObj = {
+          titleId: child.ID.toString(),
+          value: child.Value || "N/A",
+        };
+        valueArray.push(valueObj);
+      });
+    });
+    setValues(valueArray);
+  };
+
+  const handleChangeValues = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    const id = e.target.id;
+    const newData: ValueObj = {
+      titleId: id,
+      value: inputValue,
+    };
+    const newValues = values.filter((value) => value.titleId !== id);
+    newValues.push(newData);
+    setValues(newValues);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await Promise.all(
+      values.map(async (value) => {
+        await wait(1000);
+        const id = value.titleId;
+        const result = await api
+          .put(`/title/${id}`, {
+            value: value.value,
+          })
+          .catch((e) => {
+            console.log("エラーが発生しました");
+            if (e instanceof Error) {
+              console.log("メッセージ: ", e.message);
+            }
+            return e;
+          });
+        return result;
+      })
+    ).catch((e) => {
+      console.log("エラー: ", e);
+    });
+  };
+
   return (
     <>
       <Suspense fallback={<div>Loading...</div>}>
@@ -80,16 +151,37 @@ const CompanyEdit = () => {
         <div className="flex justify-between">
           {/* 資産の部 */}
           <div className="relative overflow-x-auto w-1/2">
-            <TitleFormTable family={assetsFamily} header="資産の部" />
+            <TitleFormTable
+              values={values}
+              family={assetsFamily}
+              header="資産の部"
+              onChange={handleChangeValues}
+              onSubmit={handleSubmit}
+              bgColor="bg-green-100"
+            />
           </div>
           <div className="w-1/2">
             {/* 負債の部 */}
             <div className="relative overflow-x-auto">
-              <TitleFormTable family={liabilitiesFamily} header="負債の部" />
+              <TitleFormTable
+                values={values}
+                family={liabilitiesFamily}
+                header="負債の部"
+                onChange={handleChangeValues}
+                onSubmit={handleSubmit}
+                bgColor="bg-gray-100"
+              />
             </div>
             {/* 純資産の部 */}
             <div className="relative overflow-x-auto">
-              <TitleFormTable family={netAssetsFamily} header="純資産の部" />
+              <TitleFormTable
+                values={values}
+                family={netAssetsFamily}
+                header="純資産の部"
+                onChange={handleChangeValues}
+                onSubmit={handleSubmit}
+                bgColor="bg-blue-100"
+              />
             </div>
           </div>
         </div>
