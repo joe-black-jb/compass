@@ -21,7 +21,6 @@ const CompanyDetail = () => {
   }, []);
   const getCompany = () => {
     api.get(`/company/${companyId}/titles`).then((result: AxiosResponse) => {
-      console.log("会社情報: ", result.data);
       if (result.data) {
         setCompany(result.data);
       }
