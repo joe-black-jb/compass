@@ -45,3 +45,10 @@ export interface ValueObj {
   titleId: string;
   value: string;
 }
+
+export interface ModalStatus {
+  status: string;
+  isOpen: boolean;
+  goTo?: string;
+  company?: Company;
+}

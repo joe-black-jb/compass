@@ -8,6 +8,8 @@ import { useNavigate } from "react-router-dom";
 import { getTitlesByDepth, getTitlesFamily, wait } from "../utils/funcs";
 import Button from "./Button";
 import TitleFormTable from "./TitleFormTable";
+import Modal from "./Modal";
+import { Link } from "react-router-dom";
 
 const CompanyEdit = () => {
   const navigate = useNavigate();
@@ -117,6 +119,9 @@ const CompanyEdit = () => {
     setValues(newValues);
   };
 
+  const [modalShow, setModalShow] = useState(false);
+  const [modalStatus, setModalStatus] = useState("OK");
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await Promise.all(
@@ -138,15 +143,24 @@ const CompanyEdit = () => {
       })
     ).catch((e) => {
       console.log("エラー: ", e);
+      setModalShow(true);
+      setModalStatus("NG");
     });
+    setModalShow(true);
+    setModalStatus("OK");
   };
 
   return (
     <>
       <Suspense fallback={<div>Loading...</div>}>
         <Button label="Back" onClick={() => navigate(-1)} />
-        <div className="text-xl font-bold text-gray-700 mb-10 mt-10">
-          {company?.Name} (Edit Mode)
+        <div className="flex justify-between items-center">
+          <div className="text-xl font-bold text-gray-700 mb-10 mt-10">
+            {company?.Name} (Edit Mode)
+          </div>
+          <Link to={`/company/${companyId}/new/title`}>
+            <Button label="勘定項目を追加" className="h-10" />
+          </Link>
         </div>
         <div className="flex justify-between">
           {/* 資産の部 */}
@@ -185,6 +199,9 @@ const CompanyEdit = () => {
             </div>
           </div>
         </div>
+        {modalShow && (
+          <Modal isOpen={true} status={modalStatus} company={company} />
+        )}
       </Suspense>
     </>
   );
