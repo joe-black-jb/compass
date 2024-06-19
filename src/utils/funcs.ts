@@ -45,3 +45,7 @@ export const getTitlesFamily = (
 export const wait = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
+
+export const classNames = (...classes: any) => {
+  return classes.filter(Boolean).join(" ");
+};
