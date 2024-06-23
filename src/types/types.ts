@@ -52,3 +52,23 @@ export interface ModalStatus {
   goTo?: string;
   company?: Company;
 }
+
+export interface PostTitleBody {
+  Name: string;
+  Category: string;
+  ParentTitleID?: number;
+  CompanyID: number;
+  Value?: string;
+  HasValue?: boolean;
+  Depth?: number;
+}
+
+export interface UpdateTitleBody {
+  Name?: string;
+  Category?: string;
+  ParentTitleID?: number;
+  CompanyID?: number;
+  Value?: string;
+  HasValue?: boolean;
+  Depth?: number;
+}
