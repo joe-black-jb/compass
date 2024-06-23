@@ -1,10 +1,7 @@
-import React, { Suspense, useEffect, useState } from "react";
-import axios from "axios";
-import Button from "../components/Button";
+import { Suspense, useEffect, useState } from "react";
 import api from "../api/axiosConfig";
 import { Company } from "../types/types";
 import { Link } from "react-router-dom";
-import EditIcon from "../components/EditIcon";
 
 const Home = () => {
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -57,12 +54,6 @@ const Home = () => {
                             className="hover:text-blue-500 hover:underline"
                           >
                             {company.Name}
-                          </Link>
-                          <Link
-                            to={`company/${company.ID.toString()}/edit`}
-                            className="hover:bg-gray-200 rounded-full"
-                          >
-                            <EditIcon />
                           </Link>
                         </div>
                       </td>
