@@ -1,25 +1,33 @@
 import React from "react";
-import { Title } from "../types/types";
+import { Company, Title } from "../types/types";
+import { Link } from "react-router-dom";
+import EditIcon from "./EditIcon";
 
 interface Props {
+  company: Company;
   title: Title;
   value: string | undefined;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const TableData = (props: Props) => {
-  const { title, value, onChange } = props;
+  const { company, title, value } = props;
+
+  const goToEdit = () => {
+    const url = `/company/${company?.ID?.toString()}/title/${title?.ID?.toString()}/edit`;
+    return url;
+  };
+
   return (
     <td className="px-6 py-4 font-medium text-gray-900">
-      <form className="w-16">
-        <input
-          id={title.ID.toString()}
-          value={value}
-          type="number"
-          className="w-16 border-2 border-gray-400 rounded-sm focus:ring-blue-500 focus:border-blue-500"
-          onChange={onChange}
-        />
-      </form>
+      <div className="w-32 flex justify-between items-center">
+        <div id={title.ID.toString()} className="w-16">
+          {value}
+        </div>
+        <Link to={goToEdit()} className="hover:bg-gray-200 rounded-full">
+          <EditIcon />
+        </Link>
+      </div>
     </td>
   );
 };
