@@ -1,7 +1,13 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Company, Title, TitleFamily, ValueObj } from "../types/types";
+import {
+  Company,
+  ResultModalStatus,
+  Title,
+  TitleFamily,
+  ValueObj,
+} from "../types/types";
 import api from "../api/axiosConfig";
 import { AxiosResponse } from "axios";
 import { useNavigate } from "react-router-dom";
@@ -75,36 +81,69 @@ const CompanyDetail = () => {
   }
 
   const [values, setValues] = useState<ValueObj[]>([]);
+  const [assetsSum, setAssetsSum] = useState<string>("");
+  const [liabilitiesSum, setLiabilitiesSum] = useState<string>("");
+  const [netAssetsSum, setNetAssetsSum] = useState<string>("");
+  const [sumMap, setSumMap] = useState<Map<string, number>>();
   const setValueObjs = () => {
+    const sumValueMap = new Map<string, number>();
     const valueArray: ValueObj[] = [];
+    let allAssetsSumValue = 0;
+    let allLiabilitiesSumValue = 0;
+    let allNetAssetsSumValue = 0;
     assetsFamily.forEach((parent) => {
+      let assetsValueSum = 0;
       parent.child.forEach((child) => {
+        const valueNum = Number(child.Value);
+        if (valueNum) {
+          assetsValueSum += valueNum;
+          allAssetsSumValue += valueNum;
+        }
         const valueObj = {
           titleId: child.ID.toString(),
           value: child.Value || "N/A",
         };
         valueArray.push(valueObj);
       });
+      sumValueMap.set(parent.parent, assetsValueSum);
     });
     liabilitiesFamily.forEach((parent) => {
+      let liabilitiesValueSum = 0;
       parent.child.forEach((child) => {
+        const valueNum = Number(child.Value);
+        if (valueNum) {
+          liabilitiesValueSum += valueNum;
+          allLiabilitiesSumValue += valueNum;
+        }
         const valueObj = {
           titleId: child.ID.toString(),
           value: child.Value || "N/A",
         };
         valueArray.push(valueObj);
       });
+      sumValueMap.set(parent.parent, liabilitiesValueSum);
     });
     netAssetsFamily.forEach((parent) => {
+      let netAssetsValueSum = 0;
       parent.child.forEach((child) => {
+        const valueNum = Number(child.Value);
+        if (valueNum) {
+          netAssetsValueSum += valueNum;
+          allNetAssetsSumValue += valueNum;
+        }
         const valueObj = {
           titleId: child.ID.toString(),
           value: child.Value || "N/A",
         };
         valueArray.push(valueObj);
       });
+      sumValueMap.set(parent.parent, netAssetsValueSum);
     });
     setValues(valueArray);
+    setSumMap(sumValueMap);
+    setAssetsSum(allAssetsSumValue.toString());
+    setLiabilitiesSum(allLiabilitiesSumValue.toString());
+    setNetAssetsSum(allNetAssetsSumValue.toString());
   };
 
   const handleChangeValues = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -120,7 +159,7 @@ const CompanyDetail = () => {
   };
 
   const [modalShow, setModalShow] = useState(false);
-  const [modalStatus, setModalStatus] = useState("OK");
+  const [modalStatus, setModalStatus] = useState<ResultModalStatus>("OK");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -156,7 +195,7 @@ const CompanyDetail = () => {
         <Button label="Back" onClick={() => navigate(-1)} />
         <div className="lg:flex justify-between items-center">
           <div className="text-xl font-bold text-gray-700 mb-10 mt-10">
-            {company?.Name} (Edit Mode)
+            {company?.Name}
           </div>
           <Link to={`/company/${companyId}/new/title`}>
             <Button label="勘定項目を追加" className="h-10" />
@@ -175,6 +214,8 @@ const CompanyDetail = () => {
                   onChange={handleChangeValues}
                   onSubmit={handleSubmit}
                   bgColor="bg-green-100"
+                  categorySum={assetsSum}
+                  sumMap={sumMap}
                 />
               </div>
               <div className="lg:w-1/2 md:w-2/3">
@@ -188,6 +229,8 @@ const CompanyDetail = () => {
                     onChange={handleChangeValues}
                     onSubmit={handleSubmit}
                     bgColor="bg-gray-100"
+                    categorySum={liabilitiesSum}
+                    sumMap={sumMap}
                   />
                 </div>
                 {/* 純資産の部 */}
@@ -200,17 +243,19 @@ const CompanyDetail = () => {
                     onChange={handleChangeValues}
                     onSubmit={handleSubmit}
                     bgColor="bg-blue-100"
+                    categorySum={netAssetsSum}
+                    sumMap={sumMap}
                   />
                 </div>
               </div>
             </>
           )}
         </div>
-        {modalShow && (
+        {/* {modalShow && (
           <div className="absolute z-10">
             <Modal isOpen={true} status={modalStatus} company={company} />
           </div>
-        )}
+        )} */}
       </Suspense>
     </>
   );
