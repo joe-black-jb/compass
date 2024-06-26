@@ -72,3 +72,7 @@ export interface UpdateTitleBody {
   HasValue?: boolean;
   Depth?: number;
 }
+
+export type ResultModalStatus = "OK" | "NG";
+
+export type Method = "GET" | "POST" | "PUT" | "DELETE" | "NONE";
