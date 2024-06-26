@@ -1,3 +1,4 @@
+import { AxiosError, AxiosResponse } from "axios";
 import api from "../api/axiosConfig";
 import { Company, PostTitleBody, Title, UpdateTitleBody } from "../types/types";
 
@@ -33,7 +34,6 @@ export const updateTitle = async (
   titleId: string,
   body: UpdateTitleBody
 ): Promise<Title | undefined> => {
-  console.log("リクエストBody: ", body);
   try {
     const postedTitle = await api.put(`title/${titleId}`, body);
     if (postedTitle.data) {
@@ -45,14 +45,12 @@ export const updateTitle = async (
   }
 };
 
-export const deleteTitle = async (titleId: string) => {
-  try {
-    const deleteTitle = await api.delete(`title/${titleId}`);
-    if (deleteTitle.data) {
-      return deleteTitle.data;
-    }
-    return undefined;
-  } catch (e) {
-    return undefined;
+export const deleteTitle = async (
+  titleId: string
+): Promise<Title | undefined> => {
+  const deletedTitle = await api.delete(`title/${titleId}`);
+  if (deletedTitle.data) {
+    return deletedTitle.data;
   }
+  return undefined;
 };
