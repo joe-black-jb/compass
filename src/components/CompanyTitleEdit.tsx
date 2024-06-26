@@ -1,9 +1,15 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Company, PostTitleBody, Title } from "../types/types";
+import {
+  Company,
+  Method,
+  PostTitleBody,
+  ResultModalStatus,
+  Title,
+} from "../types/types";
 import api from "../api/axiosConfig";
-import { AxiosResponse } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import { useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import Select from "../components/Select";
@@ -11,6 +17,10 @@ import SelectString from "../components/SelectString";
 import InputField from "../components/InputField";
 import { deleteTitle, updateTitle } from "../utils/apis";
 import ConfirmModal from "./ConfirmModal";
+import Modal from "./Modal";
+import { DialogTitle } from "@headlessui/react";
+import { response } from "express";
+import Checkbox from "./Checkbox";
 
 const CompanyTitleEdit = () => {
   const navigate = useNavigate();
@@ -25,10 +35,14 @@ const CompanyTitleEdit = () => {
   const [valueError, setValueError] = useState<string>("");
   const [titleNameError, setTitleNameError] = useState<string>("");
   const [postError, setPostError] = useState<string>("");
-  const [postSuccess, setPostSuccess] = useState<string>("");
   const [targetTitle, setTargetTitle] = useState<Title>();
-  const [modalShow, setModalShow] = useState(false);
-  const [modalStatus, setModalStatus] = useState("OK");
+  const [modalShow, setModalShow] = useState<boolean>(false);
+  const [resultModalShow, setResultModalShow] = useState(false);
+  const [resultModalStatus, setResultModalStatus] =
+    useState<ResultModalStatus>("OK");
+  const [method, setMethod] = useState<Method>("NONE");
+  const [dialogText, setDialogText] = useState<string>("");
+  const [isMinus, setIsMinus] = useState<boolean>(false);
 
   useEffect(() => {
     getCompanyTitles();
@@ -103,8 +117,26 @@ const CompanyTitleEdit = () => {
     setValue(e.target.value);
   };
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onClickUpdate = (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
+    setMethod("PUT");
+    setModalShow(true);
+  };
+
+  const onClickDelete = (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
+    setMethod("DELETE");
+    setModalShow(true);
+  };
+
+  const onSubmit = async (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
     // 項目名の存在チェック
     if (!titleName) {
       const msg = "項目名を入力してください";
@@ -130,7 +162,11 @@ const CompanyTitleEdit = () => {
         CompanyID: Number(companyId),
       };
       if (value && value !== "0") {
-        body.Value = value.toString();
+        if (isMinus) {
+          body.Value = `-${value.toString()}`;
+        } else {
+          body.Value = value.toString();
+        }
       } else {
         body.HasValue = false;
       }
@@ -145,32 +181,46 @@ const CompanyTitleEdit = () => {
         const updatedTitle = await updateTitle(titleId, body);
         console.log("更新した項目: ", updatedTitle);
         if (updatedTitle) {
-          setPostError("");
-          const msg = "項目の更新処理が成功しました";
-          setPostSuccess(msg);
+          setResultModalStatus("OK");
         } else {
-          const msg = "項目の更新処理に失敗しました";
-          setPostError(msg);
-          setPostSuccess("");
+          setResultModalStatus("NG");
         }
-        console.log("リクエストBODY: ", body);
+        setModalShow(false);
+        setResultModalShow(true);
       }
     }
   };
 
   // 削除関連
   const handleDelete = async () => {
-    console.log("handleDelete");
-    console.log("削除対象: ", targetTitle);
     if (targetTitle) {
-      const result = await deleteTitle(targetTitle.ID.toString());
-      if (result) {
-        console.log("削除した結果: ", result);
+      try {
+        await deleteTitle(targetTitle.ID.toString());
+        setResultModalStatus("OK");
+      } catch (e) {
+        setResultModalStatus("NG");
+        if (e instanceof AxiosError) {
+          const responseData = e.response?.data;
+          if (responseData) {
+            setDialogText(responseData.Message);
+          }
+        }
+      } finally {
+        setModalShow(false);
+        setResultModalShow(true);
       }
     }
   };
-  const handleCancel = () => {
+  const onCancel = () => {
     setModalShow(false);
+    setResultModalShow(false);
+  };
+  const goToCompanyDetail = () => {
+    navigate(`/company/${company?.ID}`);
+  };
+  const onCheckMinus = (checked: boolean) => {
+    console.log("チェックされたか: ", checked);
+    setIsMinus(!isMinus);
   };
 
   return (
@@ -180,7 +230,7 @@ const CompanyTitleEdit = () => {
         <div className="text-xl font-bold text-gray-700 mb-10 mt-10">
           {company?.Name}
         </div>
-        <form className="w-1/2" onSubmit={onSubmit}>
+        <form className="w-1/2" onSubmit={onClickUpdate}>
           <SelectString
             options={categories}
             selected={category}
@@ -207,33 +257,68 @@ const CompanyTitleEdit = () => {
             value={value}
           />
           {valueError && <div className="text-red-500">{valueError}</div>}
+          <Checkbox checked={isMinus} onCheck={onCheckMinus} />
           <div className="flex justify-end">
             <Button label="更新" onClick={() => onSubmit} className="mt-4" />
           </div>
         </form>
-        {postError && <div className="text-red-500">{postError}</div>}
-        {postSuccess && <div className="text-green-500">{postSuccess}</div>}
         <div className="w-1/2 text-right">
-          <Button
-            label="削除"
-            onClick={() => setModalShow(true)}
-            className="mt-4"
-          />
+          <Button label="削除" onClick={onClickDelete} className="mt-4" />
         </div>
-        {modalShow && (
-          <div className="fixed top-0 left-0 right-0">
-            <ConfirmModal
-              isOpen={true}
-              status={modalStatus}
-              desc="項目を削除します。よろしいですか？"
-              cancelLabel="キャンセル"
-              proceedLabel="OK"
-              onProceed={handleDelete}
-              onCancel={handleCancel}
-              open={modalShow}
-              setOpen={() => setModalShow}
-            />
-          </div>
+        {modalShow && method === "PUT" && (
+          <ConfirmModal
+            isOpen={true}
+            desc="項目を更新します。よろしいですか？"
+            cancelLabel="キャンセル"
+            proceedLabel="OK"
+            onProceed={onSubmit}
+            onCancel={onCancel}
+            open={modalShow}
+            setOpen={() => setModalShow}
+          />
+        )}
+        {modalShow && method === "DELETE" && (
+          <ConfirmModal
+            isOpen={true}
+            desc="項目を削除します。よろしいですか？"
+            cancelLabel="キャンセル"
+            proceedLabel="OK"
+            onProceed={handleDelete}
+            onCancel={onCancel}
+            open={modalShow}
+            setOpen={() => setModalShow}
+          />
+        )}
+        {resultModalShow && resultModalStatus === "OK" && (
+          <Modal
+            isOpen={true}
+            status={resultModalStatus}
+            dialogTitle={`${method === "PUT" ? "更新" : "削除"}成功`}
+            dialogText={`項目の${
+              method === "PUT" ? "更新" : "削除"
+            }が成功しました`}
+            proceedText="OK"
+            onProceed={goToCompanyDetail}
+            open={resultModalShow}
+            setOpen={() => setModalShow}
+          />
+        )}
+        {resultModalShow && resultModalStatus === "NG" && (
+          <Modal
+            isOpen={true}
+            status={resultModalStatus}
+            dialogTitle={`${method === "PUT" ? "更新" : "削除"}失敗`}
+            dialogText={
+              dialogText ||
+              `項目の${method === "PUT" ? "更新" : "削除"}が失敗しました`
+            }
+            proceedText="会社詳細画面へ"
+            cancelText="閉じる"
+            onProceed={goToCompanyDetail}
+            onCancel={onCancel}
+            open={resultModalShow}
+            setOpen={() => setModalShow}
+          />
         )}
       </Suspense>
     </>
