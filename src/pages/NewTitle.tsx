@@ -1,7 +1,12 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Company, PostTitleBody, Title } from "../types/types";
+import {
+  Company,
+  PostTitleBody,
+  ResultModalStatus,
+  Title,
+} from "../types/types";
 import api from "../api/axiosConfig";
 import { AxiosResponse } from "axios";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +15,10 @@ import Select from "../components/Select";
 import SelectString from "../components/SelectString";
 import InputField from "../components/InputField";
 import { postTitle } from "../utils/apis";
+import ConfirmModal from "../components/ConfirmModal";
+import Modal from "../components/Modal";
+import { log } from "console";
+import Checkbox from "../components/Checkbox";
 
 const NewTitle = () => {
   const navigate = useNavigate();
@@ -25,10 +34,15 @@ const NewTitle = () => {
   const [titleNameError, setTitleNameError] = useState<string>("");
   const [postError, setPostError] = useState<string>("");
   const [postSuccess, setPostSuccess] = useState<string>("");
+  const [modalShow, setModalShow] = useState<boolean>(false);
+  const [resultModalShow, setResultModalShow] = useState(false);
+  const [resultModalStatus, setResultModalStatus] =
+    useState<ResultModalStatus>("OK");
   useEffect(() => {
     getCompany();
     getCategories();
   }, []);
+  const [isMinus, setIsMinus] = useState(false);
 
   const getCompany = () => {
     api.get(`/company/${companyId}/titles`).then((result: AxiosResponse) => {
@@ -83,12 +97,15 @@ const NewTitle = () => {
     setValue(e.target.value);
   };
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
     // 項目名の存在チェック
     if (!titleName) {
       const msg = "項目名を入力してください";
       setTitleNameError(msg);
+      setModalShow(false);
     } else {
       setTitleNameError("");
     }
@@ -99,6 +116,7 @@ const NewTitle = () => {
       const msg = "値は半角数字で入力してください";
       console.log(msg);
       setValueError(msg);
+      setModalShow(false);
     } else {
       setValueError("");
     }
@@ -111,25 +129,48 @@ const NewTitle = () => {
         CompanyID: Number(companyId),
       };
       if (value && value !== "0") {
-        body.Value = value.toString();
+        if (isMinus) {
+          body.Value = `-${value.toString()}`;
+        } else {
+          body.Value = value.toString();
+        }
       } else {
         body.HasValue = false;
       }
       if (parentTitle?.ID !== 0) {
         body.Depth = 2;
       }
-
       const postedTitle = await postTitle(body);
+
       if (postedTitle) {
         setPostError("");
-        const msg = "項目の登録処理が成功しました";
-        setPostSuccess(msg);
+        setResultModalStatus("OK");
       } else {
-        const msg = "登録処理に失敗しました";
-        setPostError(msg);
-        setPostSuccess("");
+        setResultModalStatus("NG");
       }
+      setModalShow(false);
+      setResultModalShow(true);
     }
+  };
+
+  const onClickRegister = (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
+    if (!postError) {
+      setModalShow(true);
+    }
+  };
+  const onCancel = () => {
+    setModalShow(false);
+    setResultModalShow(false);
+  };
+  const goToCompanyDetail = () => {
+    navigate(`/company/${company?.ID}`);
+  };
+  const onCheckMinus = (checked: boolean) => {
+    console.log("チェックされたか: ", checked);
+    setIsMinus(!isMinus);
   };
 
   return (
@@ -139,7 +180,7 @@ const NewTitle = () => {
         <div className="text-xl font-bold text-gray-700 mb-10 mt-10">
           {company?.Name}
         </div>
-        <form className="w-1/2" onSubmit={onSubmit}>
+        <form className="w-1/2" onSubmit={onClickRegister}>
           <SelectString
             options={categories}
             selected={selectedCategory}
@@ -165,13 +206,50 @@ const NewTitle = () => {
             onChange={handleChangeValue}
             value={value}
           />
+          <Checkbox checked={isMinus} onCheck={onCheckMinus} />
           {valueError && <div className="text-red-500">{valueError}</div>}
           <div className="flex justify-end">
-            <Button label="登録" onClick={() => onSubmit} className="mt-4" />
+            <Button label="登録" onClick={onClickRegister} className="mt-4" />
           </div>
         </form>
         {postError && <div className="text-red-500">{postError}</div>}
-        {postSuccess && <div className="text-green-500">{postSuccess}</div>}
+        {modalShow && (
+          <ConfirmModal
+            desc="項目を登録します。よろしいですか？"
+            cancelLabel="キャンセル"
+            proceedLabel="OK"
+            onProceed={onSubmit}
+            onCancel={onCancel}
+            open={modalShow}
+            setOpen={() => setModalShow}
+          />
+        )}
+        {resultModalShow && resultModalStatus === "OK" && (
+          <Modal
+            isOpen={true}
+            open={resultModalShow}
+            status={resultModalStatus}
+            dialogTitle={`登録成功`}
+            dialogText={`項目の登録が成功しました`}
+            proceedText="OK"
+            onProceed={goToCompanyDetail}
+            setOpen={() => setModalShow}
+          />
+        )}
+        {resultModalShow && resultModalStatus === "NG" && (
+          <Modal
+            isOpen={true}
+            open={resultModalShow}
+            status={resultModalStatus}
+            dialogTitle={`登録失敗`}
+            dialogText={`項目の登録に失敗しました`}
+            proceedText="会社詳細画面へ"
+            cancelText="閉じる"
+            onProceed={goToCompanyDetail}
+            onCancel={onCancel}
+            setOpen={() => setModalShow}
+          />
+        )}
       </Suspense>
     </>
   );
