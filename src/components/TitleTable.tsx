@@ -3,6 +3,8 @@ import { Company, Title, TitleFamily, ValueObj } from "../types/types";
 import TableData from "./TableData";
 import Button from "./Button";
 import classNames from "classnames";
+import EditIcon from "./EditIcon";
+import { Link } from "react-router-dom";
 
 interface Props {
   company: Company;
@@ -10,13 +12,24 @@ interface Props {
   header: string;
   values: ValueObj[];
   bgColor?: string;
+  categorySum?: string;
+  sumMap?: Map<string, number>;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSubmit: (e: React.FormEvent) => void;
 }
 
 const TitleTable = (props: Props) => {
-  const { company, family, header, values, bgColor, onChange, onSubmit } =
-    props;
+  const {
+    company,
+    family,
+    header,
+    values,
+    bgColor,
+    categorySum,
+    sumMap,
+    onChange,
+    onSubmit,
+  } = props;
 
   let bgColorClass = "bg-white";
 
@@ -33,6 +46,25 @@ const TitleTable = (props: Props) => {
     return title?.value;
   };
 
+  const goToEdit = (target: string): string => {
+    const targetTitle = company?.Titles?.find((title) => title.Name === target);
+    if (targetTitle) {
+      const url = `/company/${company?.ID?.toString()}/title/${targetTitle?.ID?.toString()}/edit`;
+      return url;
+    }
+    return "";
+  };
+
+  const getParentSum = (parent: string): string | undefined => {
+    if (sumMap) {
+      const value = sumMap.get(parent)?.toString();
+      console.log(`${parent} の合計値: ${value}`);
+
+      return value;
+    }
+    return undefined;
+  };
+
   return (
     <div className="m-2">
       <Suspense fallback={<div>Loading...</div>}>
@@ -42,14 +74,23 @@ const TitleTable = (props: Props) => {
               <th scope="col" className="px-6 py-4">
                 {header}
               </th>
+              {categorySum && (
+                <th scope="col" className="px-6 py-4">
+                  {categorySum}
+                </th>
+              )}
             </tr>
           </thead>
           {family.length &&
             family.map((parent) => (
               <tbody key={parent.parent}>
                 <tr key={parent.parent} className="border-t border-gray-700">
-                  <td className="px-6 py-4 font-medium text-gray-900 pl-10">
-                    {parent.parent}
+                  <td className="flex justify-between items-center px-6 py-4 font-medium text-gray-900 pl-10">
+                    <div>{parent.parent}</div>
+                    <div>{getParentSum(parent.parent)}</div>
+                    <Link to={goToEdit(parent.parent)}>
+                      <EditIcon />
+                    </Link>
                   </td>
                 </tr>
                 {parent.child.length &&
