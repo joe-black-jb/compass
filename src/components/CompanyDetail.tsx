@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 
 import {
   Company,
@@ -11,11 +11,16 @@ import {
 import api from "../api/axiosConfig";
 import { AxiosResponse } from "axios";
 import { useNavigate } from "react-router-dom";
-import { getTitlesByDepth, getTitlesFamily, wait } from "../utils/funcs";
+import {
+  getJwtFromCookie,
+  getTitlesByDepth,
+  getTitlesFamily,
+  wait,
+} from "../utils/funcs";
 import Button from "./Button";
-import Modal from "./Modal";
 import { Link } from "react-router-dom";
 import TitleTable from "./TitleTable";
+import { authUser } from "../utils/apis";
 
 const CompanyDetail = () => {
   const navigate = useNavigate();
@@ -24,12 +29,18 @@ const CompanyDetail = () => {
   const liabilities: Title[] = [];
   const netAssets: Title[] = [];
   const { companyId } = useParams();
+  const pathname = useLocation().pathname;
+  const [admin, setAdmin] = useState<boolean>(false);
+
   useEffect(() => {
     getCompany();
+    authenticateUser();
   }, []);
+
   useEffect(() => {
     setValueObjs();
   }, [company]);
+
   const getCompany = () => {
     api.get(`/company/${companyId}/titles`).then((result: AxiosResponse) => {
       if (result.data) {
@@ -49,6 +60,18 @@ const CompanyDetail = () => {
       }
     });
   }
+
+  const authenticateUser = async () => {
+    const jwt = getJwtFromCookie();
+
+    if (jwt) {
+      // 認証
+      const isAdmin = await authUser(jwt);
+      if (isAdmin) {
+        setAdmin(true);
+      }
+    }
+  };
 
   const assetsByDepth = getTitlesByDepth(assets);
 
@@ -197,9 +220,11 @@ const CompanyDetail = () => {
           <div className="text-xl font-bold text-gray-700 mb-10 mt-10">
             {company?.Name}
           </div>
-          <Link to={`/company/${companyId}/new/title`}>
-            <Button label="勘定項目を追加" className="h-10" />
-          </Link>
+          {admin && (
+            <Link to={`/company/${companyId}/new/title`}>
+              <Button label="勘定項目を追加" className="h-10" />
+            </Link>
+          )}
         </div>
         <div className="lg:flex justify-between">
           {/* 資産の部 */}
@@ -216,6 +241,7 @@ const CompanyDetail = () => {
                   bgColor="bg-green-100"
                   categorySum={assetsSum}
                   sumMap={sumMap}
+                  admin={admin}
                 />
               </div>
               <div className="lg:w-1/2 md:w-2/3">
@@ -231,6 +257,7 @@ const CompanyDetail = () => {
                     bgColor="bg-gray-100"
                     categorySum={liabilitiesSum}
                     sumMap={sumMap}
+                    admin={admin}
                   />
                 </div>
                 {/* 純資産の部 */}
@@ -245,6 +272,7 @@ const CompanyDetail = () => {
                     bgColor="bg-blue-100"
                     categorySum={netAssetsSum}
                     sumMap={sumMap}
+                    admin={admin}
                   />
                 </div>
               </div>

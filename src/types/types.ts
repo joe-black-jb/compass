@@ -76,3 +76,8 @@ export interface UpdateTitleBody {
 export type ResultModalStatus = "OK" | "NG";
 
 export type Method = "GET" | "POST" | "PUT" | "DELETE" | "NONE";
+
+export interface Login {
+  Username: string;
+  Token: string;
+}

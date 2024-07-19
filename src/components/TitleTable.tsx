@@ -14,6 +14,7 @@ interface Props {
   bgColor?: string;
   categorySum?: string;
   sumMap?: Map<string, number>;
+  admin?: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSubmit: (e: React.FormEvent) => void;
 }
@@ -27,6 +28,7 @@ const TitleTable = (props: Props) => {
     bgColor,
     categorySum,
     sumMap,
+    admin,
     onChange,
     onSubmit,
   } = props;
@@ -58,7 +60,6 @@ const TitleTable = (props: Props) => {
   const getParentSum = (parent: string): string | undefined => {
     if (sumMap) {
       const value = sumMap.get(parent)?.toString();
-      console.log(`${parent} の合計値: ${value}`);
 
       return value;
     }
@@ -88,9 +89,11 @@ const TitleTable = (props: Props) => {
                   <td className="flex justify-between items-center px-6 py-4 font-medium text-gray-900 pl-10">
                     <div>{parent.parent}</div>
                     <div>{getParentSum(parent.parent)}</div>
-                    <Link to={goToEdit(parent.parent)}>
-                      <EditIcon />
-                    </Link>
+                    {admin && (
+                      <Link to={goToEdit(parent.parent)}>
+                        <EditIcon />
+                      </Link>
+                    )}
                   </td>
                 </tr>
                 {parent.child.length &&
@@ -104,6 +107,7 @@ const TitleTable = (props: Props) => {
                         title={child}
                         value={getValue(child)}
                         onChange={onChange}
+                        admin={admin}
                       />
                     </tr>
                   ))}

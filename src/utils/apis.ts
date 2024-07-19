@@ -1,6 +1,12 @@
 import { AxiosError, AxiosResponse } from "axios";
 import api from "../api/axiosConfig";
-import { Company, PostTitleBody, Title, UpdateTitleBody } from "../types/types";
+import {
+  Company,
+  Login,
+  PostTitleBody,
+  Title,
+  UpdateTitleBody,
+} from "../types/types";
 
 export const getCompany = async (
   companyId?: string
@@ -51,6 +57,59 @@ export const deleteTitle = async (
   const deletedTitle = await api.delete(`title/${titleId}`);
   if (deletedTitle.data) {
     return deletedTitle.data;
+  }
+  return undefined;
+};
+
+export const authUser = async (jwt: string) => {
+  try {
+    const response = await api.get(`user/auth`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    if (response.data) {
+      return response.data;
+    }
+    return false;
+  } catch (e) {
+    return undefined;
+  }
+};
+
+export const login = async (
+  email: string,
+  pass: string
+): Promise<Login | undefined> => {
+  try {
+    const res = await api.post(`login`, {
+      Email: email,
+      Password: pass,
+    });
+
+    if (res.data) {
+      return res.data;
+    }
+    return undefined;
+  } catch (e) {
+    console.log("ログインエラー: ", e);
+    return undefined;
+  }
+};
+
+export const registerUser = async (
+  username: string,
+  email: string,
+  pass: string
+) => {
+  const res = await api.post(`register`, {
+    Name: username,
+    Email: email,
+    Password: pass,
+  });
+
+  if (res.data) {
+    return res.data;
   }
   return undefined;
 };

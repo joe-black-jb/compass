@@ -4,12 +4,13 @@ import { classNames } from "../utils/funcs";
 interface Props {
   description?: string;
   label?: string;
+  password?: boolean;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export default function InputField(props: Props) {
-  const { description, label, value, onChange } = props;
+  const { description, label, password, value, onChange } = props;
   return (
     <div className="w-full max-w-md">
       <Field>
@@ -28,6 +29,7 @@ export default function InputField(props: Props) {
           )}
           onChange={onChange}
           value={value}
+          type={password ? "password" : "text"}
         />
       </Field>
     </div>

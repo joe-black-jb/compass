@@ -25,6 +25,13 @@ import {
   PhoneIcon,
   PlayCircleIcon,
 } from "@heroicons/react/20/solid";
+import ConfirmModal from "./ConfirmModal";
+import { checkLoggedIn, clearJwtFromCookie } from "../utils/funcs";
+import { useNavigate } from "react-router-dom";
+
+export interface Props {
+  username?: string;
+}
 
 const products = [
   {
@@ -67,11 +74,44 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Header() {
+export default function Header(props: Props) {
+  const { username } = props;
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [confirmModalShow, setConfirmModalShow] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(checkLoggedIn());
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    clearJwtFromCookie();
+    setConfirmModalShow(false);
+    // ホーム画面に遷移
+    navigate("/");
+    navigate(0);
+  };
+
+  const onCancel = () => {
+    setConfirmModalShow(false);
+  };
+
+  const onClickLogout = () => {
+    setConfirmModalShow(true);
+  };
 
   return (
     <header className="bg-white">
+      {confirmModalShow && (
+        <ConfirmModal
+          isOpen={true}
+          desc="ログアウトします。よろしいですか？"
+          cancelLabel="キャンセル"
+          proceedLabel="OK"
+          onProceed={handleLogout}
+          onCancel={onCancel}
+          open={confirmModalShow}
+          setOpen={() => setConfirmModalShow}
+        />
+      )}
       <nav
         className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8"
         aria-label="Global"
@@ -106,7 +146,7 @@ export default function Header() {
           </button>
         </div>
         <PopoverGroup className="hidden lg:flex lg:gap-x-12">
-          <Popover className="relative">
+          {/* <Popover className="relative">
             <PopoverButton className="flex items-center gap-x-1 text-sm font-semibold leading-6 text-gray-900">
               Product
               <ChevronDownIcon
@@ -166,9 +206,9 @@ export default function Header() {
                 </div>
               </PopoverPanel>
             </Transition>
-          </Popover>
+          </Popover> */}
 
-          <a href="#" className="text-sm font-semibold leading-6 text-gray-900">
+          {/* <a href="#" className="text-sm font-semibold leading-6 text-gray-900">
             Features
           </a>
           <a href="#" className="text-sm font-semibold leading-6 text-gray-900">
@@ -176,7 +216,33 @@ export default function Header() {
           </a>
           <a href="#" className="text-sm font-semibold leading-6 text-gray-900">
             Company
-          </a>
+          </a> */}
+          {!isLoggedIn && (
+            <>
+              <a
+                href="/login"
+                className="text-sm font-semibold leading-6 text-gray-900"
+              >
+                ログイン
+              </a>
+              <a
+                href="/register"
+                className="text-sm font-semibold leading-6 text-gray-900"
+              >
+                新規登録
+              </a>
+            </>
+          )}
+          {isLoggedIn && username && (
+            <div className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900">
+              Welcome! {username}
+            </div>
+          )}
+          {isLoggedIn && (
+            <div className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+              <button onClick={onClickLogout}>ログアウト</button>
+            </div>
+          )}
         </PopoverGroup>
         {/* <div className="hidden lg:flex lg:flex-1 lg:justify-end">
           <a href="#" className="text-sm font-semibold leading-6 text-gray-900">
@@ -214,7 +280,7 @@ export default function Header() {
           </div>
           <div className="mt-6 flow-root">
             <div className="-my-6 divide-y divide-gray-500/10">
-              <div className="space-y-2 py-6">
+              {/* <div className="space-y-2 py-6">
                 <Disclosure as="div" className="-mx-3">
                   {({ open }) => (
                     <>
@@ -261,15 +327,36 @@ export default function Header() {
                 >
                   Company
                 </a>
-              </div>
-              {/* <div className="py-6">
-                <a
-                  href="#"
-                  className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
-                >
-                  Log in
-                </a>
               </div> */}
+              <div className="py-6">
+                {!isLoggedIn && (
+                  <>
+                    <a
+                      href="/login"
+                      className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                    >
+                      ログイン
+                    </a>
+                    <a
+                      href="/register"
+                      className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50"
+                    >
+                      新規登録
+                    </a>
+                  </>
+                )}
+                {isLoggedIn && username && (
+                  <div className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900">
+                    Welcome! {username}
+                  </div>
+                )}
+                {isLoggedIn && (
+                  <div className="-mx-3 block rounded-lg px-3 py-2.5 text-base font-semibold leading-7 text-gray-900 hover:bg-gray-50">
+                    <button onClick={onClickLogout}>ログアウト</button>
+                  </div>
+                )}
+              </div>
+              <div className="py-6"></div>
             </div>
           </div>
         </DialogPanel>
