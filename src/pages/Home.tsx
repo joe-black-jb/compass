@@ -1,10 +1,12 @@
 import { Suspense, useEffect, useState } from "react";
 import api from "../api/axiosConfig";
 import { Company } from "../types/types";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import Button from "../components/Button";
 
 const Home = () => {
   const [companies, setCompanies] = useState<Company[]>([]);
+  const navigate = useNavigate();
   useEffect(() => {
     getCompanies();
   }, []);
@@ -12,13 +14,16 @@ const Home = () => {
     api
       .get("/companies")
       .then((result) => {
-        console.log("result: ", result);
         const companies = result.data;
         setCompanies(companies);
       })
       .catch((e) => {
         console.log("エラー: ", e);
       });
+  };
+
+  const onClickAddCompany = () => {
+    navigate("/new/company");
   };
 
   return (
@@ -42,7 +47,7 @@ const Home = () => {
             {companies.length > 0 &&
               companies.map((company) => {
                 return (
-                  <tbody key={company.ID}>
+                  <tbody key={company.id}>
                     <tr className="border-b border-gray-700">
                       <td
                         // scope="row"
@@ -50,7 +55,7 @@ const Home = () => {
                       >
                         <div className="flex justify-between items-center">
                           <Link
-                            to={`company/${company.ID.toString()}`}
+                            to={`company/${company.id}`}
                             className="hover:text-blue-500 hover:underline"
                           >
                             {company.Name}
@@ -66,6 +71,13 @@ const Home = () => {
                 );
               })}
           </table>
+        </div>
+        <div className="flex justify-end">
+          <Button
+            label="企業を追加"
+            onClick={onClickAddCompany}
+            className="mt-4"
+          />
         </div>
       </Suspense>
     </>
