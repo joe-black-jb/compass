@@ -51,7 +51,7 @@ const TitleTable = (props: Props) => {
   const goToEdit = (target: string): string => {
     const targetTitle = company?.Titles?.find((title) => title.Name === target);
     if (targetTitle) {
-      const url = `/company/${company?.ID?.toString()}/title/${targetTitle?.ID?.toString()}/edit`;
+      const url = `/company/${company?.id?.toString()}/title/${targetTitle?.ID?.toString()}/edit`;
       return url;
     }
     return "";

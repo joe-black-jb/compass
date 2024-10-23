@@ -216,7 +216,7 @@ const CompanyTitleEdit = () => {
     setResultModalShow(false);
   };
   const goToCompanyDetail = () => {
-    navigate(`/company/${company?.ID}`);
+    navigate(`/company/${company?.id}`);
   };
   const onCheckMinus = (checked: boolean) => {
     console.log("チェックされたか: ", checked);

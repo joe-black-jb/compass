@@ -15,7 +15,7 @@ const TableData = (props: Props) => {
   const { admin, company, title, value } = props;
 
   const goToEdit = () => {
-    const url = `/company/${company?.ID?.toString()}/title/${title?.ID?.toString()}/edit`;
+    const url = `/company/${company?.id?.toString()}/title/${title?.ID?.toString()}/edit`;
     return url;
   };
 
