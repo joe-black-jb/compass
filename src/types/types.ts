@@ -17,12 +17,13 @@ export interface Title {
 
 export interface Company {
   CreatedAt: string;
-  ID: number;
+  id: string;
   Name: string;
   Titles?: Title[] | null;
   UpdatedAt: string;
   Established: string | null;
   Capital: string | null;
+  EDINETCode: string;
 }
 
 // export interface Value {
