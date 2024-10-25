@@ -81,3 +81,12 @@ export const checkLoggedIn = (): boolean => {
   }
   return false;
 };
+
+export const getRatio = (top: number, bottom: number): number => {
+  return Math.floor((top / bottom) * 100);
+};
+
+export const getHeightClass = (num: number): string => {
+  // return `h-[${num}%]`;
+  return `${num}%`;
+};

@@ -5,7 +5,6 @@ import Home from "./pages/Home";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import About from "./pages/About";
-import NewTitle from "./pages/NewTitle";
 import CompanyTitleEdit from "./components/CompanyTitleEdit";
 import CompanyDetail from "./components/CompanyDetail";
 import Login from "./pages/Login";
@@ -41,13 +40,12 @@ function App() {
   return (
     <>
       <Header username={username} />
-      <div className="m-20">
+      <div className="m-4 md:m-16">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<RegisterUser />} />
           <Route path="/about" element={<About />} />
-          <Route path="/company/:companyId/new/title" element={<NewTitle />} />
           <Route
             path="/company/:companyId/title/:titleId/edit"
             element={<CompanyTitleEdit />}

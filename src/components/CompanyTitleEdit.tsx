@@ -228,7 +228,7 @@ const CompanyTitleEdit = () => {
       <Suspense fallback={<div>Loading...</div>}>
         <Button label="Back" onClick={() => navigate(-1)} />
         <div className="text-xl font-bold text-gray-700 mb-10 mt-10">
-          {company?.Name}
+          {company?.name}
         </div>
         <form className="w-1/2" onSubmit={onClickUpdate}>
           <SelectString

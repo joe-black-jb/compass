@@ -3,6 +3,7 @@ import api from "../api/axiosConfig";
 import { Company } from "../types/types";
 import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
+import ReportIcon from "../components/ReportIcon";
 
 const Home = () => {
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -26,21 +27,20 @@ const Home = () => {
     navigate("/new/company");
   };
 
+  // console.log("companies[0]: ", companies[0]);
+
   return (
     <>
       <Suspense fallback={<div>Loading...</div>}>
         <div className="relative overflow-x-auto">
-          <table className="w-full text-sm text-left rtl:text-right text-gray-700">
+          <table className="w-full text-sm text-left text-gray-700">
             <thead className="text-xs text-gray-700 uppercase font-bold">
               <tr className="border-b border-gray-700">
                 <th scope="col" className="px-6 py-3">
                   企業名
                 </th>
                 <th scope="col" className="px-6 py-3">
-                  創業
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  資本金（百万）
+                  資料
                 </th>
               </tr>
             </thead>
@@ -58,14 +58,19 @@ const Home = () => {
                             to={`company/${company.id}`}
                             className="hover:text-blue-500 hover:underline"
                           >
-                            {company.Name}
+                            {company.name}
                           </Link>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
-                        {company.Established || "N/A"}
+                      {/* 資料 */}
+                      <td className="flex px-6 py-4">
+                        {company.bs === 1 && (
+                          <ReportIcon label="B/S" color="green" />
+                        )}
+                        {company.pl === 1 && (
+                          <ReportIcon label="P/L" color="blue" />
+                        )}
                       </td>
-                      <td className="px-6 py-4">{company.Capital || "N/A"}</td>
                     </tr>
                   </tbody>
                 );
