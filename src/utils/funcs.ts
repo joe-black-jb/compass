@@ -90,3 +90,13 @@ export const getHeightClass = (num: number): string => {
   // return `h-[${num}%]`;
   return `${num}%`;
 };
+
+export const getPeriodYear = (periodStr: string): number => {
+  const splitPeriodStr = periodStr.split("-");
+  const periodNum = Number(splitPeriodStr[0]);
+  return periodNum;
+};
+
+export const formatUnitStr = (unitStr: string): string => {
+  return unitStr;
+};

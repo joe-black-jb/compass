@@ -40,7 +40,7 @@ function App() {
   return (
     <>
       <Header username={username} />
-      <div className="m-4 md:m-16">
+      <div className="mx-4 mt-24 md:mx-16">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />

@@ -13,12 +13,21 @@ import {
 } from "../types/types";
 import api from "../api/axiosConfig";
 import { AxiosResponse } from "axios";
-import { getHeightClass, getJwtFromCookie, getRatio } from "../utils/funcs";
+import {
+  getHeightClass,
+  getJwtFromCookie,
+  getPeriodYear,
+  getRatio,
+} from "../utils/funcs";
 import { authUser } from "../utils/apis";
 import BsSummary from "./BsSummary";
 import PlSummary from "./PlSummary";
 import { log } from "console";
 import SalesProfit from "./SalesProfit";
+import Capital from "./Capital";
+
+// TODO: 2つの企業の比較機能
+// TODO: 業界ごとの営業利益率などの平均を出す => バックエンドで業界をタグづけしておく必要あり
 
 const CompanyDetail = () => {
   const [company, setCompany] = useState<Company>();
@@ -29,6 +38,9 @@ const CompanyDetail = () => {
   const [latestBsJson, setLatestBsJson] = useState<BsJson>();
   const [latestPlJson, setLatestPlJson] = useState<PlJson>();
   const [fundamentals, setFundamentals] = useState<Fundamental[]>([]);
+  const [periodStart, setPeriodStart] = useState<string>();
+  const [periodEnd, setPeriodEnd] = useState<string>();
+  const [unitStr, setUnitStr] = useState<string>("");
 
   useEffect(() => {
     getCompany();
@@ -75,6 +87,15 @@ const CompanyDetail = () => {
       const data = reports[0].data;
       const bsJson: BsJson = JSON.parse(data);
       setLatestBsJson(bsJson);
+      if (bsJson.period_start && !periodStart) {
+        setPeriodStart(bsJson.period_start);
+      }
+      if (bsJson.period_end && !periodEnd) {
+        setPeriodEnd(bsJson.period_end);
+      }
+      if (bsJson.unit_string && !unitStr) {
+        setUnitStr(bsJson.unit_string);
+      }
     }
   };
 
@@ -84,6 +105,15 @@ const CompanyDetail = () => {
       const data = reports[0].data;
       const plJson: PlJson = JSON.parse(data);
       setLatestPlJson(plJson);
+      if (plJson.period_start && !periodStart) {
+        setPeriodStart(plJson.period_start);
+      }
+      if (plJson.period_end && !periodEnd) {
+        setPeriodEnd(plJson.period_end);
+      }
+      if (plJson.unit_string && !unitStr) {
+        setUnitStr(plJson.unit_string);
+      }
     }
   };
 
@@ -112,12 +142,23 @@ const CompanyDetail = () => {
       })
       .then((res) => {
         const fundamentals = res.data as Fundamental[];
-        setFundamentals(fundamentals);
+        if (fundamentals && fundamentals.length > 0) {
+          fundamentals.sort((a, b) => {
+            const periodStartA = getPeriodYear(a.period_start);
+            const periodStartB = getPeriodYear(b.period_start);
+
+            // ダイオーズが複数ある
+            // // 降順
+            // return periodStartB - periodStartA;
+            // 昇順
+            return periodStartA - periodStartB;
+          });
+          setFundamentals(fundamentals);
+        }
       });
   };
 
   console.log("fundamentals: ", fundamentals);
-
   // console.log("BsJson: ", latestBsJson);
   // console.log("BsJson.tangible_assets: ", latestBsJson?.tangible_assets);
   // console.log("PlJson: ", latestPlJson);
@@ -143,16 +184,29 @@ const CompanyDetail = () => {
     <>
       <Suspense fallback={<div>Loading...</div>}>
         <div>{company?.name}</div>
-        <div className="mt-4">【比例縮尺図】</div>
-        <div className="lg:flex">
-          {/* 比例縮尺図コンポーネント (BS) */}
-          {latestBsJson && <BsSummary data={latestBsJson} />}
-          {/* 比例縮尺図コンポーネント (PL) */}
-          {latestPlJson && <PlSummary data={latestPlJson} />}
-        </div>
+        {(latestBsJson || latestPlJson) && (
+          <div className="mt-4">
+            【比例縮尺図 ({periodStart} ~ {periodEnd})】
+          </div>
+        )}
+        <div className="xl:flex w-full">
+          <div className="flex justify-center w-full">
+            {/* 比例縮尺図コンポーネント */}
+            {latestBsJson && <BsSummary data={latestBsJson} />}
+            {latestPlJson && <PlSummary data={latestPlJson} />}
+          </div>
 
-        {/* 主要な指標 (売上高、営業利益率、売上高営業利益率など) => 5年分くらい欲しい*/}
-        <SalesProfit fundamentals={fundamentals} />
+          <div>
+            {fundamentals && fundamentals.length > 0 && (
+              <div>
+                {/* 売上高営業利益率 */}
+                <SalesProfit fundamentals={fundamentals} unitStr={unitStr} />
+                {/* 自己資本比率 */}
+                <Capital fundamentals={fundamentals} unitStr={unitStr} />
+              </div>
+            )}
+          </div>
+        </div>
 
         {/* dangerouslySetInnerHTML を使って HTML をレンダリング */}
         {latestBsHtml && (

@@ -144,6 +144,7 @@ export interface PlSummaryHeightClass {
 export interface Fundamental {
   company_name: string;
   liabilities: number;
+  net_assets: number;
   operating_profit: number;
   sales: number;
   period_start: string;

@@ -10,7 +10,7 @@ interface Props {
 const Button = (props: Props) => {
   const { className, label, onClick } = props;
   const defaultClassName =
-    "hover:bg-gray-500 text-gray-700 font-bold py-2 px-4 rounded border-2 border-gray-700";
+    "hover:bg-green-200 text-gray-700 font-bold py-2 px-4 rounded border-2 border-gray-700";
   const mergedClassName = classNames(defaultClassName, className);
   return (
     <button className={mergedClassName} onClick={onClick}>

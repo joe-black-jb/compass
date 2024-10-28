@@ -1,19 +1,35 @@
 import { Suspense, useEffect, useState } from "react";
+import { debounce } from "lodash";
+import { Link } from "react-router-dom";
+
 import api from "../api/axiosConfig";
 import { Company } from "../types/types";
-import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import ReportIcon from "../components/ReportIcon";
+import SearchInput from "../components/SearchInput";
 
+// TODO: 企業一覧表示にページング機能を追加する
 const Home = () => {
+  // UIに表示する企業データ
   const [companies, setCompanies] = useState<Company[]>([]);
-  const navigate = useNavigate();
+  // 検索結果
+  const [searchedCompanies, setSearchedCompanies] = useState<Company[]>([]);
+  // 検索処理などで使用する企業データ
+  const [allCompanies, setAllCompanies] = useState<Company[]>([]);
+  const [companyName, setCompanyName] = useState<string>("");
+
   useEffect(() => {
     getCompanies();
+    getAllCompanies();
   }, []);
+
   const getCompanies = () => {
     api
-      .get("/companies")
+      .get("/companies", {
+        params: {
+          limit: 50,
+        },
+      })
       .then((result) => {
         const companies = result.data;
         setCompanies(companies);
@@ -23,14 +39,75 @@ const Home = () => {
       });
   };
 
-  const onClickAddCompany = () => {
-    navigate("/new/company");
+  const getAllCompanies = () => {
+    api
+      .get("/companies")
+      .then((result) => {
+        const allCompanies = result.data;
+        setAllCompanies(allCompanies);
+      })
+      .catch((e) => {
+        console.log("エラー: ", e);
+      });
+  };
+
+  const handleChangeCompanyName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e?.target?.value;
+    setCompanyName(input);
+  };
+
+  const filterCompanies = debounce((input: string) => {
+    const filtered = allCompanies.filter(
+      (company) => company.name.indexOf(input) !== -1 // 部分一致でフィルタリング
+    );
+    // setCompanies(filtered);
+  }, 1000);
+
+  const handleSearch = () => {
+    if (companyName) {
+      api
+        .get("/search/companies", {
+          params: {
+            companyName,
+          },
+        })
+        .then((res) => {
+          const companies = res.data;
+          if (companies && companies.length > 0) {
+            setSearchedCompanies(companies);
+          }
+          console.log(`「${companyName}」で検索した結果: ${res.data}`);
+        });
+    } else {
+      setCompanyName("");
+      setSearchedCompanies([]);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // Enterキーによるデフォルト動作を防ぐ（フォームがある場合）
+      handleSearch();
+    }
   };
 
   // console.log("companies[0]: ", companies[0]);
 
+  const displayCompanies =
+    searchedCompanies && searchedCompanies.length > 0
+      ? searchedCompanies
+      : companies;
+
   return (
     <>
+      <div className="flex justify-center mb-10">
+        <SearchInput
+          value={companyName}
+          onChange={handleChangeCompanyName}
+          onClick={handleSearch}
+          onKeyDown={handleKeyDown}
+        />
+      </div>
       <Suspense fallback={<div>Loading...</div>}>
         <div className="relative overflow-x-auto">
           <table className="w-full text-sm text-left text-gray-700">
@@ -44,8 +121,8 @@ const Home = () => {
                 </th>
               </tr>
             </thead>
-            {companies.length > 0 &&
-              companies.map((company) => {
+            {displayCompanies.length > 0 &&
+              displayCompanies.map((company) => {
                 return (
                   <tbody key={company.id}>
                     <tr className="border-b border-gray-700">
@@ -76,13 +153,6 @@ const Home = () => {
                 );
               })}
           </table>
-        </div>
-        <div className="flex justify-end">
-          <Button
-            label="企業を追加"
-            onClick={onClickAddCompany}
-            className="mt-4"
-          />
         </div>
       </Suspense>
     </>
