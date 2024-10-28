@@ -12,6 +12,7 @@ const PlSummary = (props: Props) => {
 
   const minRatio = 10;
   const singleLineRatio = 15;
+  const operatingLossMinRatio = -10;
 
   const hiddenTitles: TitleData[] = [];
 
@@ -51,7 +52,7 @@ const PlSummary = (props: Props) => {
     });
   }
   // 販売費及び一般管理費の割合
-  const sgAndARatio = getRatio(sgAndA, left);
+  let sgAndARatio = getRatio(sgAndA, left);
   plSummaryHeightClass.sgAndAHeightClass = getHeightClass(sgAndARatio);
   if (sgAndARatio < minRatio) {
     hiddenTitles.push({
@@ -89,13 +90,20 @@ const PlSummary = (props: Props) => {
   } else {
     operatingProfitRatio = getRatio(operatingProfit, right);
   }
-  // TODO: マイナスも加味する
-  if (operatingProfitRatio < minRatio) {
+  if (operatingProfit >= 0 && operatingProfitRatio < minRatio) {
     hiddenTitles.push({
       titleName: "営業利益",
       value: operatingProfit,
       ratio: operatingProfitRatio,
       color: "green",
+    });
+  }
+  if (operatingProfit < 0 && operatingProfitRatio < minRatio) {
+    hiddenTitles.push({
+      titleName: "営業損失",
+      value: operatingProfit,
+      ratio: operatingProfitRatio,
+      color: "purple",
     });
   }
 
@@ -118,13 +126,19 @@ const PlSummary = (props: Props) => {
     plSummaryHeightClass.operatingProfitHeightClass = getHeightClass(
       operatingProfitRatio + rightExtra
     );
+    // 販管費にleftExtraを足す
+    plSummaryHeightClass.sgAndAHeightClass = getHeightClass(
+      sgAndARatio + leftExtra
+    );
   }
   // console.log("【PL】借方のあまり割合: ", leftExtra);
 
-  // TODO: ハビックスのPL縮尺図がおかしい => 売上高が ※1 10,897,603 となっているのが原因 => 修正に時間がかかる
+  // console.log(
+  //   `「${data.company_name}」の operatingProfitRatio: ${operatingProfitRatio}`
+  // );
 
   return (
-    <div className="mb-20 lg:ml-10">
+    <div className="mb-20 ml-10 w-[240px] lg:w-[350px]">
       <div className="mt-4">【P/L (単位：{data.unit_string})】</div>
       <div className="flex justify-center md:justify-start mt-2 w-full">
         {/* 借方 */}
@@ -154,7 +168,9 @@ const PlSummary = (props: Props) => {
           </div>
           {/* 販売費及び一般管理費 */}
           <div
-            className="bg-blue-100 border-x-2 border-b-2 border-gray-600 text-center flex items-center justify-center"
+            className={`bg-blue-100 border-x-2 border-b-2 border-gray-600 text-center flex items-center justify-center ${
+              operatingProfit < 0 && "rounded-bl-2xl"
+            } `}
             style={{ height: plSummaryHeightClass.sgAndAHeightClass }}
           >
             <div className={getRatio(sgAndA, left) < minRatio ? "hidden" : ""}>
@@ -219,26 +235,38 @@ const PlSummary = (props: Props) => {
           {/* 営業損失 */}
           {operatingProfitRatio < 0 && (
             <div
-              className="bg-purple-100 relative border-r-2 border-b-2 border-gray-600 text-center flex items-center justify-center"
+              className="bg-purple-100 rounded-br-2xl border-r-2 border-b-2 border-gray-600 text-center flex items-center justify-center"
               style={{
                 height: plSummaryHeightClass.operatingProfitHeightClass,
               }}
             >
               <div
                 className={
-                  operatingProfitRatio < minRatio ? "absolute top-4" : ""
+                  operatingProfitRatio > operatingLossMinRatio ? "hidden" : ""
                 }
               >
-                <div>営業損失</div>
-                <div>{data.operating_profit.current.toLocaleString()}</div>
-                <div>({operatingProfitRatio}%)</div>
+                {operatingProfitRatio > singleLineRatio ? (
+                  <SummaryTitleTexts
+                    titleName="営業損失"
+                    valueStr={data.operating_profit.current.toLocaleString()}
+                    ratio={operatingProfitRatio}
+                    singleLine={false}
+                  />
+                ) : (
+                  <SummaryTitleTexts
+                    titleName="営業損失"
+                    valueStr={data.operating_profit.current.toLocaleString()}
+                    ratio={operatingProfitRatio}
+                    singleLine={true}
+                  />
+                )}
               </div>
             </div>
           )}
         </div>
       </div>
       {hiddenTitles && hiddenTitles.length > 0 && (
-        <div className="flex justify-center md:justify-start">
+        <div className="flex justify-start">
           <div>
             <div className="mt-4">【非表示の項目】</div>
             <div>

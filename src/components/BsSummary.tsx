@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { BsJson, BsSummaryHeightClass, TitleData } from "../types/types";
-import { getHeightClass, getRatio } from "../utils/funcs";
+import { getHeightClass, getPeriodYear, getRatio } from "../utils/funcs";
 import SummaryTitleTexts from "./SummaryTitleTexts";
 import HiddenTitle from "./HiddenTitle";
 
@@ -14,6 +14,9 @@ const BsSummary = (props: Props) => {
   const singleLineRatio = 15;
 
   const hiddenTitles: TitleData[] = [];
+
+  const fiscalYear = getPeriodYear(data.period_start);
+  // console.log("会計年度: ", fiscalYear);
 
   const bsSummaryHeightClass: BsSummaryHeightClass = {
     currentAssetsHeightClass: "",
@@ -161,23 +164,10 @@ const BsSummary = (props: Props) => {
     netAssetsRatio + rightExtra
   );
 
-  // console.log("貸方のあまり割合: ", rightExtra);
-
-  // console.log(
-  //   "固定負債の割合: ",
-  //   bsSummaryHeightClass.fixedLiabilitiesHeightClass
-  // );
-  // console.log(
-  //   "投資その他の資産の割合: ",
-  //   bsSummaryHeightClass.investmentsAndOtherAssetsHeightClass
-  // );
-
-  // TODO: 15% 以下の場合 1行で表示する
-  // console.log("hiddenTitles: ", hiddenTitles);
-  // console.log("固定負債比率: ", fixedLiabilitiesRatio);
+  // TODO: 最新のサマリーを表示する
 
   return (
-    <div className="mb-20">
+    <div className="mb-20 w-[240px] lg:w-[350px]">
       <div className="mt-4">【B/S (単位：{data.unit_string})】</div>
       <div className="flex justify-center md:justify-start mt-2 w-full">
         {/* 借方 */}
