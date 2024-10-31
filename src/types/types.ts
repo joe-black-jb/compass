@@ -83,7 +83,7 @@ export interface Login {
 }
 
 export interface ReportData {
-  fileName: string;
+  file_name: string;
   data: string;
 }
 export interface Period {
@@ -124,6 +124,19 @@ export interface PlJson {
   operating_profit: Period;
 }
 
+export interface CfJson {
+  company_name: string;
+  period_start: string;
+  period_end: string;
+  unit_string: string;
+  operating_cf: Period;
+  investing_cf: Period;
+  financing_cf: Period;
+  free_cf: Period;
+  start_cash: Period;
+  end_cash: Period;
+}
+
 export interface BsSummaryHeightClass {
   currentAssetsHeightClass: string;
   tangibleAssetsHeightClass: string;
@@ -149,4 +162,19 @@ export interface Fundamental {
   sales: number;
   period_start: string;
   period_end: string;
+}
+
+export interface TitleValue {
+  title: string;
+  value: string;
+  color?: string;
+}
+
+export type ChartTitle = "SalesProfit" | "Capital" | "CashFlow";
+
+export interface ChartDescData {
+  title: string;
+  color: string;
+  isLine: boolean;
+  isLast: boolean;
 }
