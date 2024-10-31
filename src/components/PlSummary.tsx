@@ -1,14 +1,24 @@
 import { useEffect, useState } from "react";
-import { PlJson, PlSummaryHeightClass, TitleData } from "../types/types";
+import {
+  PlJson,
+  PlSummaryHeightClass,
+  ReportData,
+  TitleData,
+} from "../types/types";
 import { getHeightClass, getRatio } from "../utils/funcs";
 import SummaryTitleTexts from "./SummaryTitleTexts";
 import HiddenTitle from "./HiddenTitle";
 
 interface Props {
-  data: PlJson;
+  reportData: ReportData;
+  periodStart?: string;
+  periodEnd?: string;
 }
 const PlSummary = (props: Props) => {
-  const { data } = props;
+  const { reportData, periodStart, periodEnd } = props;
+  const { data } = reportData;
+
+  const summary: PlJson = JSON.parse(data);
 
   const minRatio = 10;
   const singleLineRatio = 15;
@@ -25,13 +35,13 @@ const PlSummary = (props: Props) => {
 
   // 項目ごとの割合計算
   // 営業利益 (マイナスになる場合もあるので先に計算)
-  const operatingProfit = data.operating_profit.current;
+  const operatingProfit = summary.operating_profit.current;
   // console.log("【PL】営業利益: ", operatingProfit);
 
   // 売上原価
-  const costOfGoodsSold = data.cost_of_goods_sold.current;
-  // 販売費及び一般管理費
-  const sgAndA = data.sg_and_a.current;
+  const costOfGoodsSold = summary.cost_of_goods_sold.current;
+  // 販管費
+  const sgAndA = summary.sg_and_a.current;
 
   let left = costOfGoodsSold + sgAndA;
   // 営業利益がプラスの場合、借方に加算
@@ -51,12 +61,12 @@ const PlSummary = (props: Props) => {
       color: "red",
     });
   }
-  // 販売費及び一般管理費の割合
+  // 販管費の割合
   let sgAndARatio = getRatio(sgAndA, left);
   plSummaryHeightClass.sgAndAHeightClass = getHeightClass(sgAndARatio);
   if (sgAndARatio < minRatio) {
     hiddenTitles.push({
-      titleName: "販売費及び一般管理費の割合",
+      titleName: "販管費",
       value: sgAndA,
       ratio: sgAndARatio,
       color: "blue",
@@ -64,7 +74,7 @@ const PlSummary = (props: Props) => {
   }
 
   // 売上高
-  const sales = data.sales.current;
+  const sales = summary.sales.current;
   // 売上高の割合
   const salesRatio = getRatio(sales, left);
   plSummaryHeightClass.salesHeightClass = getHeightClass(salesRatio);
@@ -98,13 +108,18 @@ const PlSummary = (props: Props) => {
       color: "green",
     });
   }
-  if (operatingProfit < 0 && operatingProfitRatio < minRatio) {
-    hiddenTitles.push({
-      titleName: "営業損失",
-      value: operatingProfit,
-      ratio: operatingProfitRatio,
-      color: "purple",
-    });
+
+  if (operatingProfit < 0) {
+    // 営業利益率の絶対値
+    const operatingProfitRatioAbs = -operatingProfitRatio;
+    if (operatingProfit < 0 && operatingProfitRatioAbs < minRatio) {
+      hiddenTitles.push({
+        titleName: "営業損失",
+        value: operatingProfit,
+        ratio: operatingProfitRatio,
+        color: "purple",
+      });
+    }
   }
 
   let salesClass =
@@ -131,15 +146,18 @@ const PlSummary = (props: Props) => {
       sgAndARatio + leftExtra
     );
   }
-  // console.log("【PL】借方のあまり割合: ", leftExtra);
-
-  // console.log(
-  //   `「${data.company_name}」の operatingProfitRatio: ${operatingProfitRatio}`
-  // );
 
   return (
-    <div className="mb-20 ml-10 w-[240px] lg:w-[350px]">
-      <div className="mt-4">【P/L (単位：{data.unit_string})】</div>
+    <div className="mb-20 sm:ml-10 full sm:w-[240px] lg:w-[350px] mx-auto sm:mx-0">
+      <div className="bg-green-300 font-bold rounded-xl py-2 px-2">
+        <div className="text-center">損益計算書</div>
+        {periodStart && periodEnd && (
+          <div className="text-center">
+            ({periodStart} ~ {periodEnd})
+          </div>
+        )}
+      </div>
+      <div className="mt-4">(単位：{summary.unit_string})</div>
       <div className="flex justify-center md:justify-start mt-2 w-full">
         {/* 借方 */}
         <div className="h-[500px] w-52">
@@ -152,21 +170,21 @@ const PlSummary = (props: Props) => {
               {costOfGoodsSoldRatio > singleLineRatio ? (
                 <SummaryTitleTexts
                   titleName="売上原価"
-                  valueStr={data.cost_of_goods_sold.current.toLocaleString()}
+                  valueStr={summary.cost_of_goods_sold.current.toLocaleString()}
                   ratio={costOfGoodsSoldRatio}
                   singleLine={false}
                 />
               ) : (
                 <SummaryTitleTexts
                   titleName="売上原価"
-                  valueStr={data.cost_of_goods_sold.current.toLocaleString()}
+                  valueStr={summary.cost_of_goods_sold.current.toLocaleString()}
                   ratio={costOfGoodsSoldRatio}
                   singleLine={true}
                 />
               )}
             </div>
           </div>
-          {/* 販売費及び一般管理費 */}
+          {/* 販管費 */}
           <div
             className={`bg-blue-100 border-x-2 border-b-2 border-gray-600 text-center flex items-center justify-center ${
               operatingProfit < 0 && "rounded-bl-2xl"
@@ -176,15 +194,15 @@ const PlSummary = (props: Props) => {
             <div className={getRatio(sgAndA, left) < minRatio ? "hidden" : ""}>
               {sgAndARatio > singleLineRatio ? (
                 <SummaryTitleTexts
-                  titleName="販売費及び一般管理費"
-                  valueStr={data.sg_and_a.current.toLocaleString()}
+                  titleName="販管費"
+                  valueStr={summary.sg_and_a.current.toLocaleString()}
                   ratio={sgAndARatio}
                   singleLine={false}
                 />
               ) : (
                 <SummaryTitleTexts
-                  titleName="販売費及び一般管理費"
-                  valueStr={data.sg_and_a.current.toLocaleString()}
+                  titleName="販管費"
+                  valueStr={summary.sg_and_a.current.toLocaleString()}
                   ratio={sgAndARatio}
                   singleLine={true}
                 />
@@ -203,14 +221,14 @@ const PlSummary = (props: Props) => {
                 {operatingProfitRatio > singleLineRatio ? (
                   <SummaryTitleTexts
                     titleName="営業利益"
-                    valueStr={data.operating_profit.current.toLocaleString()}
+                    valueStr={summary.operating_profit.current.toLocaleString()}
                     ratio={operatingProfitRatio}
                     singleLine={false}
                   />
                 ) : (
                   <SummaryTitleTexts
                     titleName="営業利益"
-                    valueStr={data.operating_profit.current.toLocaleString()}
+                    valueStr={summary.operating_profit.current.toLocaleString()}
                     ratio={operatingProfitRatio}
                     singleLine={true}
                   />
@@ -228,7 +246,7 @@ const PlSummary = (props: Props) => {
           >
             <div className={salesRatio < minRatio ? "hidden" : ""}>
               <div>売上高</div>
-              <div>{data.sales.current.toLocaleString()}</div>
+              <div>{summary.sales.current.toLocaleString()}</div>
               <div>({salesRatio}%)</div>
             </div>
           </div>
@@ -248,14 +266,14 @@ const PlSummary = (props: Props) => {
                 {operatingProfitRatio > singleLineRatio ? (
                   <SummaryTitleTexts
                     titleName="営業損失"
-                    valueStr={data.operating_profit.current.toLocaleString()}
+                    valueStr={summary.operating_profit.current.toLocaleString()}
                     ratio={operatingProfitRatio}
                     singleLine={false}
                   />
                 ) : (
                   <SummaryTitleTexts
                     titleName="営業損失"
-                    valueStr={data.operating_profit.current.toLocaleString()}
+                    valueStr={summary.operating_profit.current.toLocaleString()}
                     ratio={operatingProfitRatio}
                     singleLine={true}
                   />

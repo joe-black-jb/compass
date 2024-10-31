@@ -1,21 +1,30 @@
-import { useEffect, useState } from "react";
-import { BsJson, BsSummaryHeightClass, TitleData } from "../types/types";
+import {
+  BsJson,
+  BsSummaryHeightClass,
+  ReportData,
+  TitleData,
+} from "../types/types";
 import { getHeightClass, getPeriodYear, getRatio } from "../utils/funcs";
 import SummaryTitleTexts from "./SummaryTitleTexts";
 import HiddenTitle from "./HiddenTitle";
 
 interface Props {
-  data: BsJson;
+  reportData: ReportData;
+  periodStart?: string;
+  periodEnd?: string;
 }
 const BsSummary = (props: Props) => {
-  const { data } = props;
+  const { reportData, periodStart, periodEnd } = props;
+  const { data } = reportData;
+
+  const summary: BsJson = JSON.parse(data);
 
   const minRatio = 10;
   const singleLineRatio = 15;
 
   const hiddenTitles: TitleData[] = [];
 
-  const fiscalYear = getPeriodYear(data.period_start);
+  const fiscalYear = getPeriodYear(summary.period_start);
   // console.log("会計年度: ", fiscalYear);
 
   const bsSummaryHeightClass: BsSummaryHeightClass = {
@@ -28,21 +37,24 @@ const BsSummary = (props: Props) => {
     netAssetsHeightClass: "",
   };
 
+  // console.log("BsSummary: ", summary);
+
   // 項目ごとの割合計算
   // 流動資産
-  const currentAssets = data.current_assets.current;
+  const currentAssets = summary.current_assets.current;
   // 有形固定資産
-  const tangibleAssets = data.tangible_assets.current;
+  const tangibleAssets = summary.tangible_assets.current;
   // 無形固定資産
-  const intangibleAssets = data.intangible_assets.current;
+  const intangibleAssets = summary.intangible_assets.current;
   // 投資その他の資産
-  const investmentsAndOtherAssets = data.investments_and_other_assets.current;
+  const investmentsAndOtherAssets =
+    summary.investments_and_other_assets.current;
   // 流動負債
-  const currentLiabilities = data.current_liabilities.current;
+  const currentLiabilities = summary.current_liabilities.current;
   // 固定負債
-  const fixedLiabilities = data.fixed_liabilities.current;
+  const fixedLiabilities = summary.fixed_liabilities.current;
   // 純資産
-  const netAssets = data.net_assets.current;
+  const netAssets = summary.net_assets.current;
 
   const left =
     currentAssets +
@@ -164,11 +176,17 @@ const BsSummary = (props: Props) => {
     netAssetsRatio + rightExtra
   );
 
-  // TODO: 最新のサマリーを表示する
-
   return (
-    <div className="mb-20 w-[240px] lg:w-[350px]">
-      <div className="mt-4">【B/S (単位：{data.unit_string})】</div>
+    <div className="mb-20 w-full sm:w-[240px] lg:w-[350px] mx-auto sm:mx-0">
+      <div className="bg-green-300 font-bold rounded-xl py-2 px-2">
+        <div className="text-center">貸借対照表</div>
+        {periodStart && periodEnd && (
+          <div className="text-center">
+            ({periodStart} ~ {periodEnd})
+          </div>
+        )}
+      </div>
+      <div className="mt-4">(単位：{summary.unit_string})</div>
       <div className="flex justify-center md:justify-start mt-2 w-full">
         {/* 借方 */}
         <div className="h-[500px] w-52">
@@ -181,14 +199,14 @@ const BsSummary = (props: Props) => {
               {currentAssetsRatio > singleLineRatio ? (
                 <SummaryTitleTexts
                   titleName="流動資産"
-                  valueStr={data.current_assets.current.toLocaleString()}
+                  valueStr={summary.current_assets.current.toLocaleString()}
                   ratio={currentAssetsRatio}
                   singleLine={false}
                 />
               ) : (
                 <SummaryTitleTexts
                   titleName="流動資産"
-                  valueStr={data.current_assets.current.toLocaleString()}
+                  valueStr={summary.current_assets.current.toLocaleString()}
                   ratio={currentAssetsRatio}
                   singleLine={false}
                 />
@@ -204,14 +222,14 @@ const BsSummary = (props: Props) => {
               {tangibleAssetsRatio > singleLineRatio ? (
                 <SummaryTitleTexts
                   titleName="有形固定資産"
-                  valueStr={data.tangible_assets.current.toLocaleString()}
+                  valueStr={summary.tangible_assets.current.toLocaleString()}
                   ratio={tangibleAssetsRatio}
                   singleLine={false}
                 />
               ) : (
                 <SummaryTitleTexts
                   titleName="有形固定資産"
-                  valueStr={data.tangible_assets.current.toLocaleString()}
+                  valueStr={summary.tangible_assets.current.toLocaleString()}
                   ratio={tangibleAssetsRatio}
                   singleLine={true}
                 />
@@ -227,14 +245,14 @@ const BsSummary = (props: Props) => {
               {intangibleAssetsRatio > singleLineRatio ? (
                 <SummaryTitleTexts
                   titleName="無形固定資産"
-                  valueStr={data.intangible_assets.current.toLocaleString()}
+                  valueStr={summary.intangible_assets.current.toLocaleString()}
                   ratio={intangibleAssetsRatio}
                   singleLine={false}
                 />
               ) : (
                 <SummaryTitleTexts
                   titleName="無形固定資産"
-                  valueStr={data.intangible_assets.current.toLocaleString()}
+                  valueStr={summary.intangible_assets.current.toLocaleString()}
                   ratio={intangibleAssetsRatio}
                   singleLine={true}
                 />
@@ -256,14 +274,14 @@ const BsSummary = (props: Props) => {
               {investmentsAndOtherAssetsRatio > singleLineRatio ? (
                 <SummaryTitleTexts
                   titleName="投資その他の資産"
-                  valueStr={data.investments_and_other_assets.current.toLocaleString()}
+                  valueStr={summary.investments_and_other_assets.current.toLocaleString()}
                   ratio={investmentsAndOtherAssetsRatio}
                   singleLine={false}
                 />
               ) : (
                 <SummaryTitleTexts
                   titleName="投資その他の資産"
-                  valueStr={data.investments_and_other_assets.current.toLocaleString()}
+                  valueStr={summary.investments_and_other_assets.current.toLocaleString()}
                   ratio={investmentsAndOtherAssetsRatio}
                   singleLine={true}
                 />
@@ -284,14 +302,14 @@ const BsSummary = (props: Props) => {
               {currentLiabilitiesRatio > singleLineRatio ? (
                 <SummaryTitleTexts
                   titleName="流動負債"
-                  valueStr={data.current_liabilities.current.toLocaleString()}
+                  valueStr={summary.current_liabilities.current.toLocaleString()}
                   ratio={currentLiabilitiesRatio}
                   singleLine={false}
                 />
               ) : (
                 <SummaryTitleTexts
                   titleName="流動負債"
-                  valueStr={data.current_liabilities.current.toLocaleString()}
+                  valueStr={summary.current_liabilities.current.toLocaleString()}
                   ratio={currentLiabilitiesRatio}
                   singleLine={true}
                 />
@@ -307,14 +325,14 @@ const BsSummary = (props: Props) => {
               {fixedLiabilitiesRatio > singleLineRatio ? (
                 <SummaryTitleTexts
                   titleName="固定負債"
-                  valueStr={data.fixed_liabilities.current.toLocaleString()}
+                  valueStr={summary.fixed_liabilities.current.toLocaleString()}
                   ratio={fixedLiabilitiesRatio}
                   singleLine={false}
                 />
               ) : (
                 <SummaryTitleTexts
                   titleName="固定負債"
-                  valueStr={data.fixed_liabilities.current.toLocaleString()}
+                  valueStr={summary.fixed_liabilities.current.toLocaleString()}
                   ratio={fixedLiabilitiesRatio}
                   singleLine={true}
                 />
@@ -330,14 +348,14 @@ const BsSummary = (props: Props) => {
               {netAssets > singleLineRatio ? (
                 <SummaryTitleTexts
                   titleName="純資産"
-                  valueStr={data.net_assets.current.toLocaleString()}
+                  valueStr={summary.net_assets.current.toLocaleString()}
                   ratio={netAssetsRatio}
                   singleLine={false}
                 />
               ) : (
                 <SummaryTitleTexts
                   titleName="純資産"
-                  valueStr={data.net_assets.current.toLocaleString()}
+                  valueStr={summary.net_assets.current.toLocaleString()}
                   ratio={netAssetsRatio}
                   singleLine={true}
                 />
