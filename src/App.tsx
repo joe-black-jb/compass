@@ -1,24 +1,19 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import "./App.css";
 import Home from "./pages/Home";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
 import About from "./pages/About";
 import CompanyTitleEdit from "./components/CompanyTitleEdit";
 import CompanyDetail from "./components/CompanyDetail";
 import Login from "./pages/Login";
 import RegisterUser from "./pages/RegisterUser";
-import {
-  checkLoggedIn,
-  getJwtFromCookie,
-  getUsernameFromCookie,
-} from "./utils/funcs";
+import { getJwtFromCookie, getUsernameFromCookie } from "./utils/funcs";
 import { authUser } from "./utils/apis";
+import Header2 from "./components/Header2";
 
 function App() {
   useEffect(() => {
-    checkAccount();
+    // checkAccount();
   }, []);
   const [username, setUsername] = useState<string>("");
   let isAdmin = false;
@@ -39,8 +34,8 @@ function App() {
   };
   return (
     <>
-      <Header username={username} />
-      <div className="mx-4 mt-24 md:mx-16">
+      <Header2 />
+      <div className="mx-10 mt-24 md:mx-16">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
