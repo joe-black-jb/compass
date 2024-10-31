@@ -12,7 +12,8 @@ const HiddenTitle = (props: Props) => {
       <div
         className={`bg-${titleData.color}-100 px-2 py-1 rounded-2xl border-2 border-gray-600`}
       >
-        {titleData.titleName} {titleData.value} ({titleData.ratio}%)
+        {titleData.titleName} {titleData.value.toLocaleString()} (
+        {titleData.ratio}%)
       </div>
     </div>
   );
