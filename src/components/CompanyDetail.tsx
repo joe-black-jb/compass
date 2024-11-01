@@ -7,12 +7,14 @@ import {
   Company,
   Fundamental,
   ReportData,
+  ReportDataWithPeriod,
 } from "../types/types";
 import api from "../api/axiosConfig";
 import { AxiosResponse } from "axios";
 import {
   getJwtFromCookie,
   getPeriodsFromFileName,
+  getReportsWithPeriod,
   removeDuplicates,
   sortFile,
   sortFundamentals,
@@ -25,12 +27,7 @@ import Capital from "./Capital";
 import CashFlow from "./CashFlow";
 import TitleMarker from "./TitleMarker";
 import Button from "./Button";
-
-// NOTE: ラクスル が 2024 October で処理できて資料が揃ってる
-// TODO: 2つの企業の比較機能
-// TODO: 業界ごとの営業利益率などの平均を出す => バックエンドで業界をタグづけしておく必要あり
-// TODO: グレイステクノロジー株式会社 が複数ある => 年次ごとの表示のテストに使える
-// TODO: サマリーの単位表示
+import NoSummary from "./NoSummary";
 
 const CompanyDetail = () => {
   const navigate = useNavigate();
@@ -39,17 +36,17 @@ const CompanyDetail = () => {
   const { companyId } = useParams();
   const [admin, setAdmin] = useState<boolean>(false);
   // BS
-  const [bsHtmls, setBsHtmls] = useState<ReportData[]>([]);
+  const [bsHtmls, setBsHtmls] = useState<ReportDataWithPeriod[]>([]);
   const [latestBsHtml, setLatestBsHtml] = useState<ReportData>();
-  const [bsJsons, setBsJsons] = useState<ReportData[]>([]);
+  const [bsJsons, setBsJsons] = useState<ReportDataWithPeriod[]>([]);
   const [latestBsJson, setLatestBsJson] = useState<ReportData>();
   const [latestBsPeriodStart, setLatestBsPeriodStart] = useState<string>();
   const [latestBsPeriodEnd, setLatestBsPeriodEnd] = useState<string>();
 
   // PL
-  const [plHtmls, setPlHtmls] = useState<ReportData[]>([]);
+  const [plHtmls, setPlHtmls] = useState<ReportDataWithPeriod[]>([]);
   const [latestPlHtml, setLatestPlHtml] = useState<ReportData>();
-  const [plJsons, setPlJsons] = useState<ReportData[]>([]);
+  const [plJsons, setPlJsons] = useState<ReportDataWithPeriod[]>([]);
   const [latestPlJson, setLatestPlJson] = useState<ReportData>();
   const [latestPlPeriodStart, setLatestPlPeriodStart] = useState<string>();
   const [latestPlPeriodEnd, setLatestPlPeriodEnd] = useState<string>();
@@ -62,6 +59,8 @@ const CompanyDetail = () => {
   const [cfUnitStr, setCfUnitStr] = useState<string>("");
   // Fundamental
   const [fundamentals, setFundamentals] = useState<Fundamental[]>([]);
+  const [hasOperatingRevenueAndCost, setHasOperatingRevenueAndCost] =
+    useState<boolean>(false);
 
   const [periodStart, setPeriodStart] = useState<string>();
   const [periodEnd, setPeriodEnd] = useState<string>();
@@ -75,13 +74,13 @@ const CompanyDetail = () => {
   useEffect(() => {
     if (company) {
       // BS
-      getBsHtmlReports(company);
-      getBsJsonReports(company);
+      getHtmlReports(company, "BS");
+      getJsonReports(company, "BS");
       // PL
-      getPlHtmlReports(company);
-      getPlJsonReports(company);
+      getHtmlReports(company, "PL");
+      getJsonReports(company, "PL");
       // CF
-      getCfHtmlReports(company);
+      getHtmlReports(company, "CF");
       getCfJsonReports(company);
       // Fundamental
       getFundamentals(company);
@@ -96,80 +95,75 @@ const CompanyDetail = () => {
     });
   };
 
-  const getBsHtmlReports = async (company: Company) => {
-    const result = await getReports(company, "BS", "html");
+  const getHtmlReports = async (company: Company, reportType: string) => {
+    const result = await getReports(company, reportType, "html");
     if (result && result.length > 0) {
       const reports = result;
       const sortedReports = sortFile(reports);
       const latest = sortedReports.pop();
       if (latest) {
-        setLatestBsHtml(latest);
+        if (reportType === "BS") {
+          setLatestBsHtml(latest);
+        } else if (reportType === "PL") {
+          setLatestPlHtml(latest);
+        } else if (reportType === "CF") {
+          setLatestCfHtml(latest);
+        }
       }
-      setBsHtmls(sortedReports);
+
+      if (sortedReports && sortedReports.length) {
+        const reportsWithPeriod = getReportsWithPeriod(sortedReports);
+        if (reportType === "BS") {
+          setBsHtmls(reportsWithPeriod);
+        } else if (reportType === "PL") {
+          setPlHtmls(reportsWithPeriod);
+        } else if (reportType === "CF") {
+          setCfHtmls(sortedReports);
+        }
+      }
     }
   };
 
-  const getBsJsonReports = async (company: Company) => {
-    const reports = await getReports(company, "BS", "json");
+  const getJsonReports = async (company: Company, reportType: string) => {
+    const reports = await getReports(company, reportType, "json");
+
     if (reports && reports.length > 0) {
       const uniqueReports = removeDuplicates(reports);
-      const sortedReports = sortFile(uniqueReports);
+      const sortedReports = sortFile(uniqueReports, "desc");
       const latest = sortedReports.pop();
       if (latest) {
-        setLatestBsJson(latest);
+        if (reportType === "BS") {
+          setLatestBsJson(latest);
+        } else if (reportType === "PL") {
+          setLatestPlJson(latest);
+        }
+
         const periods = getPeriodsFromFileName(latest.file_name);
         if (periods && periods.length >= 2) {
-          const periodStr = `${periods[0]} ~ ${periods[1]}`;
-          setLatestBsPeriodStart(periods[0]);
-          setLatestBsPeriodEnd(periods[1]);
-        }
-        if (latest.data) {
-          const bsJson: BsJson = JSON.parse(latest.data);
-          setUnitStr(bsJson.unit_string);
-        }
-      }
-      setBsJsons(sortedReports);
-    }
-  };
+          if (reportType === "BS") {
+            setLatestBsPeriodStart(periods[0]);
+            setLatestBsPeriodEnd(periods[1]);
 
-  const getPlHtmlReports = async (company: Company) => {
-    const reports = await getReports(company, "PL", "html");
-    if (reports && reports.length > 0) {
-      const sortedReports = sortFile(reports);
-      const latest = sortedReports.pop();
-      if (latest) {
-        setLatestPlHtml(latest);
-      }
-      setPlHtmls(sortedReports);
-    }
-  };
-
-  const getPlJsonReports = async (company: Company) => {
-    const reports = await getReports(company, "PL", "json");
-    if (reports && reports.length > 0) {
-      const sortedReports = sortFile(reports);
-      const latest = sortedReports.pop();
-      if (latest) {
-        setLatestPlJson(latest);
-        const periods = getPeriodsFromFileName(latest.file_name);
-        if (periods && periods.length >= 2) {
-          setLatestPlPeriodStart(periods[0]);
-          setLatestPlPeriodEnd(periods[1]);
+            if (latest.data) {
+              const bsJson: BsJson = JSON.parse(latest.data);
+              setUnitStr(bsJson.unit_string);
+            }
+          } else if (reportType === "PL") {
+            setLatestPlPeriodStart(periods[0]);
+            setLatestPlPeriodEnd(periods[1]);
+          }
         }
       }
-      setPlJsons(sortedReports);
-    }
-  };
 
-  const getCfHtmlReports = async (company: Company) => {
-    const reports: ReportData[] = await getReports(company, "CF", "html");
-    if (reports && reports.length > 0) {
-      const sortedReports = sortFile(reports);
-      const latest = sortedReports.pop();
-      if (latest) {
-        setLatestCfHtml(latest);
+      if (sortedReports && sortedReports.length) {
+        const reportsWithPeriod = getReportsWithPeriod(sortedReports);
+
+        if (reportType === "BS") {
+          setBsJsons(reportsWithPeriod);
+        } else if (reportType === "PL") {
+          setPlJsons(reportsWithPeriod);
+        }
       }
-      setCfHtmls(sortedReports);
     }
   };
 
@@ -220,6 +214,11 @@ const CompanyDetail = () => {
         if (fundamentals && fundamentals.length > 0) {
           const sortedFundamentals = sortFundamentals(fundamentals);
           setFundamentals(sortedFundamentals);
+
+          const hasOperatingRevenueAndCost = fundamentals.some(
+            (data) => data.has_operating_revenue && data.has_operating_cost
+          );
+          setHasOperatingRevenueAndCost(hasOperatingRevenueAndCost);
         }
       });
   };
@@ -237,43 +236,94 @@ const CompanyDetail = () => {
   };
 
   const goBack = () => {
-    console.log("go back");
     navigate("/");
   };
 
-  // NOTE: AHC が CF ある
+  const ArrangedBsSummary = () => {
+    if (bsJsons && bsJsons.length >= 2) {
+      return (
+        <div className="block">
+          {bsJsons?.map((bs) => (
+            <BsSummary
+              reportData={bs}
+              periodStart={bs.periodStart}
+              periodEnd={bs.periodEnd}
+            />
+          ))}
+        </div>
+      );
+    } else if (latestBsJson && latestBsHtml) {
+      return (
+        <BsSummary
+          reportData={latestBsJson}
+          periodStart={latestBsPeriodStart}
+          periodEnd={latestBsPeriodEnd}
+        />
+      );
+    } else {
+      return <NoSummary reportType="貸借対照表" />;
+    }
+  };
+
+  const ArrangedPlSummary = () => {
+    if (plJsons && plJsons.length >= 2) {
+      return (
+        <div className="block">
+          {plJsons?.map((pl) => (
+            <PlSummary
+              reportData={pl}
+              periodStart={pl.periodStart}
+              periodEnd={pl.periodEnd}
+            />
+          ))}
+        </div>
+      );
+    } else if (latestPlJson && latestPlHtml) {
+      return (
+        <PlSummary
+          reportData={latestPlJson}
+          periodStart={latestPlPeriodStart}
+          periodEnd={latestPlPeriodEnd}
+        />
+      );
+    } else {
+      return <NoSummary reportType="損益計算書" />;
+    }
+  };
 
   return (
     <div className="mb-20">
-      <Button label="戻る" className="border-[1px]" onClick={goBack} />
+      <div className="flex justify-between">
+        <Button label="戻る" className="border-[1px]" onClick={goBack} />
+        {/* <Button
+          label="異なる年度のデータ"
+          className="border-[1px]"
+          onClick={goOther}
+        /> */}
+      </div>
       <Suspense fallback={<div>Loading...</div>}>
-        <div className="text-center">{company?.name}</div>
+        <div className="mt-4 text-center">{company?.name}</div>
         <TitleMarker title="比例縮尺図" />
         <div className="xl:flex xl:justify-between sm:w-full xl:w-[50%]">
           <div className="sm:flex sm:justify-center sm:w-full mx-auto xl:ml-[20%] xl:w-[600px]">
             {/* 比例縮尺図コンポーネント */}
-            {latestBsJson && latestBsHtml && (
-              <BsSummary
-                reportData={latestBsJson}
-                periodStart={latestBsPeriodStart}
-                periodEnd={latestBsPeriodEnd}
-              />
-            )}
-            {latestPlJson && (
-              <PlSummary
-                reportData={latestPlJson}
-                periodStart={latestPlPeriodStart}
-                periodEnd={latestPlPeriodEnd}
-              />
-            )}
+            <ArrangedBsSummary />
+            <ArrangedPlSummary />
           </div>
 
           <div>
             {fundamentals && fundamentals.length > 0 && (
               <div className="xl:mx-[30%]">
-                {/* 売上高営業利益率 */}
-                <TitleMarker title="売上高営業利益率" />
-                <SalesProfit fundamentals={fundamentals} unitStr={unitStr} />
+                {!hasOperatingRevenueAndCost && (
+                  // 売上高営業利益率
+                  <>
+                    <TitleMarker title="売上高営業利益率" />
+                    <SalesProfit
+                      fundamentals={fundamentals}
+                      unitStr={unitStr}
+                    />
+                  </>
+                )}
                 {/* 自己資本比率 */}
                 <TitleMarker title="自己資本比率" />
                 <Capital fundamentals={fundamentals} unitStr={unitStr} />
@@ -292,19 +342,28 @@ const CompanyDetail = () => {
         {/* dangerouslySetInnerHTML を使って HTML をレンダリング */}
         <div className="xl:flex">
           {latestBsHtml && latestBsHtml.data && (
-            <div
-              className="xl:mr-8"
-              dangerouslySetInnerHTML={{ __html: latestBsHtml.data }}
-            />
+            <div className="xl:mr-8">
+              <TitleMarker title="貸借対照表" />
+              <div className="flex justify-center">
+                <div dangerouslySetInnerHTML={{ __html: latestBsHtml.data }} />
+              </div>
+            </div>
           )}
           {latestPlHtml && latestPlHtml.data && (
-            <div
-              className="xl:mr-8"
-              dangerouslySetInnerHTML={{ __html: latestPlHtml.data }}
-            />
+            <div className="xl:mr-8">
+              <TitleMarker title="損益計算書" />
+              <div className="flex justify-center">
+                <div dangerouslySetInnerHTML={{ __html: latestPlHtml.data }} />
+              </div>
+            </div>
           )}
           {latestCfHtml && latestCfHtml.data && (
-            <div dangerouslySetInnerHTML={{ __html: latestCfHtml.data }} />
+            <div className="xl:mr-8">
+              <TitleMarker title="キャッシュ・フロー計算書" />
+              <div className="flex justify-center">
+                <div dangerouslySetInnerHTML={{ __html: latestCfHtml.data }} />
+              </div>
+            </div>
           )}
         </div>
       </Suspense>
