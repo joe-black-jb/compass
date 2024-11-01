@@ -1,6 +1,5 @@
-import { ChartDescData, Fundamental } from "../types/types";
+import { Fundamental } from "../types/types";
 import { getPeriodYear } from "../utils/funcs";
-import { bluePurple, green, orange } from "../constants/constants";
 import Chart from "./Chart";
 
 interface Props {
@@ -10,26 +9,6 @@ interface Props {
 
 const SalesProfit = (props: Props) => {
   const { fundamentals, unitStr } = props;
-  const chartDescData: ChartDescData[] = [
-    {
-      title: "売上高",
-      color: bluePurple,
-      isLine: false,
-      isLast: false,
-    },
-    {
-      title: "営業利益",
-      color: green,
-      isLine: false,
-      isLast: false,
-    },
-    {
-      title: "売上高営業利益率",
-      color: orange,
-      isLine: true,
-      isLast: true,
-    },
-  ];
 
   // 綺麗にグラフが描けるように加工
   const data = fundamentals.map((fundamental) => {
@@ -45,14 +24,7 @@ const SalesProfit = (props: Props) => {
     };
   });
 
-  return (
-    <Chart
-      chartTitle="SalesProfit"
-      data={data}
-      chartDescData={chartDescData}
-      unitStr={unitStr}
-    />
-  );
+  return <Chart chartTitle="SalesProfit" data={data} unitStr={unitStr} />;
 };
 
 export default SalesProfit;

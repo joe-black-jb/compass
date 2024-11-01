@@ -1,4 +1,3 @@
-import { Legend } from "@headlessui/react";
 import React from "react";
 import {
   Bar,
@@ -7,6 +6,7 @@ import {
   Line,
   ResponsiveContainer,
   Tooltip,
+  Legend,
   XAxis,
   YAxis,
 } from "recharts";
@@ -20,18 +20,16 @@ import {
   orange,
 } from "../constants/constants";
 import { getChartWindowStrs, shortenUnitStr } from "../utils/funcs";
-import { ChartDescData, ChartTitle } from "../types/types";
+import { ChartTitle } from "../types/types";
 
 interface Props {
   chartTitle: ChartTitle;
   data: any[] | undefined;
-  chartDescData: ChartDescData[];
   unitStr: string;
 }
 
 const Chart = (props: Props) => {
-  const { chartTitle, data, chartDescData, unitStr } = props;
-  console.log("受け取ったデータ: ", data);
+  const { chartTitle, data, unitStr } = props;
 
   // 単位をつけるフォーマッタ関数
   const formatYAxis = (tickItem: number, index: number): string => {
@@ -46,7 +44,7 @@ const Chart = (props: Props) => {
   return (
     <div className="mb-10 xl:w-[600px] xl:ml-[10%]">
       <div className="flex justify-center">
-        <ResponsiveContainer minWidth={300} width="100%" height={250}>
+        <ResponsiveContainer minWidth={350} width="100%" height={250}>
           <ComposedChart
             data={data}
             margin={{ left: chartMarginLeft, right: chartMarginRight }}
@@ -108,18 +106,21 @@ const Chart = (props: Props) => {
             {chartTitle === "SalesProfit" && (
               <>
                 <Bar
+                  name="売上高"
                   dataKey="sales"
                   fill={bluePurple}
                   yAxisId="left"
                   barSize={barSize}
                 />
                 <Bar
+                  name="営業利益"
                   dataKey="operatingProfit"
                   fill={green}
                   yAxisId="left"
                   barSize={barSize}
                 />
                 <Line
+                  name="売上高営業利益率"
                   type="linear"
                   dataKey="operatingProfitRatio"
                   yAxisId="right"
@@ -130,24 +131,28 @@ const Chart = (props: Props) => {
             {chartTitle === "Capital" && (
               <>
                 <Bar
+                  name="資本合計"
                   dataKey="capitalSum"
                   fill={bluePurple}
                   yAxisId="left"
                   barSize={barSize}
                 />
                 <Bar
+                  name="純資産"
                   dataKey="netAssets"
                   fill={green}
                   yAxisId="left"
                   barSize={barSize}
                 />
                 <Bar
+                  name="負債"
                   dataKey="liabilities"
                   fill={gold}
                   yAxisId="left"
                   barSize={barSize}
                 />
                 <Line
+                  name="自己資本比率"
                   type="linear"
                   dataKey="ownedCapitalRatio"
                   yAxisId="right"
@@ -158,24 +163,28 @@ const Chart = (props: Props) => {
             {chartTitle === "CashFlow" && (
               <>
                 <Bar
+                  name="営業CF"
                   dataKey="operatingCf"
                   fill={bluePurple}
                   yAxisId="left"
                   barSize={barSize}
                 />
                 <Bar
+                  name="投資CF"
                   dataKey="investingCf"
                   fill={green}
                   yAxisId="left"
                   barSize={barSize}
                 />
                 <Bar
+                  name="財務CF"
                   dataKey="financingCf"
                   fill={gold}
                   yAxisId="left"
                   barSize={barSize}
                 />
                 <Bar
+                  name="フリーCF"
                   dataKey="freeCf"
                   fill={orange}
                   yAxisId="left"
@@ -185,28 +194,6 @@ const Chart = (props: Props) => {
             )}
           </ComposedChart>
         </ResponsiveContainer>
-      </div>
-      <div className={`min-[500px]:flex justify-center min-w-[300px]`}>
-        {chartDescData.map((data) => (
-          <div
-            className={
-              data.isLast
-                ? "flex justify-center"
-                : "flex justify-center min-[500px]:mr-4"
-            }
-          >
-            <div
-              className={
-                data.isLine
-                  ? `w-[60px] min-[500px]:w-[40px] h-[2px] bg-[${data.color}] mr-2 self-center`
-                  : `w-[60px] min-[500px]:w-[40px] bg-[${data.color}] my-1 mr-2`
-              }
-            ></div>
-            <div className="w-[40%] min-[500px]:w-[100%] ml-4 min-[500px]:ml-0">
-              {data.title}
-            </div>
-          </div>
-        ))}
       </div>
     </div>
   );
