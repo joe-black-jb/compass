@@ -4,9 +4,11 @@ import {
   ReportData,
   TitleData,
 } from "../types/types";
-import { getHeightClass, getPeriodYear, getRatio } from "../utils/funcs";
+import { getHeightClass, getRatio } from "../utils/funcs";
 import SummaryTitleTexts from "./SummaryTitleTexts";
 import HiddenTitle from "./HiddenTitle";
+import SummaryTitle from "./SummaryTitle";
+import DisclosureSummary from "./DisclosureSummary";
 
 interface Props {
   reportData: ReportData;
@@ -23,9 +25,6 @@ const BsSummary = (props: Props) => {
   const singleLineRatio = 15;
 
   const hiddenTitles: TitleData[] = [];
-
-  const fiscalYear = getPeriodYear(summary.period_start);
-  // console.log("会計年度: ", fiscalYear);
 
   const bsSummaryHeightClass: BsSummaryHeightClass = {
     currentAssetsHeightClass: "",
@@ -176,206 +175,232 @@ const BsSummary = (props: Props) => {
     netAssetsRatio + rightExtra
   );
 
-  return (
-    <div className="mb-20 w-full sm:w-[240px] lg:w-[350px] mx-auto sm:mx-0">
-      <div className="bg-green-300 font-bold rounded-xl py-2 px-2">
-        <div className="text-center">貸借対照表</div>
-        {periodStart && periodEnd && (
-          <div className="text-center">
-            ({periodStart} ~ {periodEnd})
+  const SummaryTitleEl = (): JSX.Element => {
+    return (
+      <SummaryTitle
+        title="貸借対照表"
+        periodStart={periodStart}
+        periodEnd={periodEnd}
+      />
+    );
+  };
+
+  const MainEl = (): JSX.Element => {
+    return (
+      <>
+        <div className="mt-4">(単位：{summary.unit_string})</div>
+        <div className="flex justify-center md:justify-start mt-2 w-full">
+          {/* 借方 */}
+          <div className="h-[500px] w-52">
+            {/* 流動資産 */}
+            <div
+              className="bg-red-100 border-2 border-gray-600 rounded-tl-2xl text-center flex items-center justify-center"
+              style={{
+                height: bsSummaryHeightClass.currentAssetsHeightClass,
+              }}
+            >
+              <div className={currentAssetsRatio < minRatio ? "hidden" : ""}>
+                {currentAssetsRatio > singleLineRatio ? (
+                  <SummaryTitleTexts
+                    titleName="流動資産"
+                    valueStr={summary.current_assets.current.toLocaleString()}
+                    ratio={currentAssetsRatio}
+                    singleLine={false}
+                  />
+                ) : (
+                  <SummaryTitleTexts
+                    titleName="流動資産"
+                    valueStr={summary.current_assets.current.toLocaleString()}
+                    ratio={currentAssetsRatio}
+                    singleLine={false}
+                  />
+                )}
+              </div>
+            </div>
+            {/* 有形固定資産 */}
+            <div
+              className="bg-blue-100 border-x-2 border-b-2 border-gray-600 text-center flex items-center justify-center"
+              style={{
+                height: bsSummaryHeightClass.tangibleAssetsHeightClass,
+              }}
+            >
+              <div className={tangibleAssetsRatio < minRatio ? "hidden" : ""}>
+                {tangibleAssetsRatio > singleLineRatio ? (
+                  <SummaryTitleTexts
+                    titleName="有形固定資産"
+                    valueStr={summary.tangible_assets.current.toLocaleString()}
+                    ratio={tangibleAssetsRatio}
+                    singleLine={false}
+                  />
+                ) : (
+                  <SummaryTitleTexts
+                    titleName="有形固定資産"
+                    valueStr={summary.tangible_assets.current.toLocaleString()}
+                    ratio={tangibleAssetsRatio}
+                    singleLine={true}
+                  />
+                )}
+              </div>
+            </div>
+            {/* 無形固定資産 */}
+            <div
+              className="bg-green-100 border-x-2 border-b-2 border-gray-600 text-center flex items-center justify-center"
+              style={{
+                height: bsSummaryHeightClass.intangibleAssetsHeightClass,
+              }}
+            >
+              <div className={intangibleAssetsRatio < minRatio ? "hidden" : ""}>
+                {intangibleAssetsRatio > singleLineRatio ? (
+                  <SummaryTitleTexts
+                    titleName="無形固定資産"
+                    valueStr={summary.intangible_assets.current.toLocaleString()}
+                    ratio={intangibleAssetsRatio}
+                    singleLine={false}
+                  />
+                ) : (
+                  <SummaryTitleTexts
+                    titleName="無形固定資産"
+                    valueStr={summary.intangible_assets.current.toLocaleString()}
+                    ratio={intangibleAssetsRatio}
+                    singleLine={true}
+                  />
+                )}
+              </div>
+            </div>
+            {/* 投資その他の資産 */}
+            <div
+              className="bg-yellow-100 rounded-bl-2xl border-x-2 border-b-2 border-gray-600 text-center flex items-center justify-center"
+              style={{
+                height:
+                  bsSummaryHeightClass.investmentsAndOtherAssetsHeightClass,
+              }}
+            >
+              <div
+                className={
+                  investmentsAndOtherAssetsRatio < minRatio ? "hidden" : ""
+                }
+              >
+                {investmentsAndOtherAssetsRatio > singleLineRatio ? (
+                  <SummaryTitleTexts
+                    titleName="投資その他の資産"
+                    valueStr={summary.investments_and_other_assets.current.toLocaleString()}
+                    ratio={investmentsAndOtherAssetsRatio}
+                    singleLine={false}
+                  />
+                ) : (
+                  <SummaryTitleTexts
+                    titleName="投資その他の資産"
+                    valueStr={summary.investments_and_other_assets.current.toLocaleString()}
+                    ratio={investmentsAndOtherAssetsRatio}
+                    singleLine={true}
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+          {/* 貸方 */}
+          <div className="h-[500px] w-52">
+            {/* 流動負債 */}
+            <div
+              className="bg-gray-100 rounded-tr-2xl border-y-2 border-r-2 border-gray-600 text-center flex items-center justify-center"
+              style={{
+                height: bsSummaryHeightClass.currentLiabilitiesHeightClass,
+              }}
+            >
+              <div
+                className={currentLiabilitiesRatio < minRatio ? "hidden" : ""}
+              >
+                {currentLiabilitiesRatio > singleLineRatio ? (
+                  <SummaryTitleTexts
+                    titleName="流動負債"
+                    valueStr={summary.current_liabilities.current.toLocaleString()}
+                    ratio={currentLiabilitiesRatio}
+                    singleLine={false}
+                  />
+                ) : (
+                  <SummaryTitleTexts
+                    titleName="流動負債"
+                    valueStr={summary.current_liabilities.current.toLocaleString()}
+                    ratio={currentLiabilitiesRatio}
+                    singleLine={true}
+                  />
+                )}
+              </div>
+            </div>
+            {/* 固定負債 */}
+            <div
+              className="bg-purple-100 border-r-2 border-b-2 border-gray-600 text-center flex items-center justify-center"
+              style={{
+                height: bsSummaryHeightClass.fixedLiabilitiesHeightClass,
+              }}
+            >
+              <div className={fixedLiabilitiesRatio < minRatio ? "hidden" : ""}>
+                {fixedLiabilitiesRatio > singleLineRatio ? (
+                  <SummaryTitleTexts
+                    titleName="固定負債"
+                    valueStr={summary.fixed_liabilities.current.toLocaleString()}
+                    ratio={fixedLiabilitiesRatio}
+                    singleLine={false}
+                  />
+                ) : (
+                  <SummaryTitleTexts
+                    titleName="固定負債"
+                    valueStr={summary.fixed_liabilities.current.toLocaleString()}
+                    ratio={fixedLiabilitiesRatio}
+                    singleLine={true}
+                  />
+                )}
+              </div>
+            </div>
+            {/* 純資産 */}
+            <div
+              className="bg-orange-100 rounded-br-2xl border-r-2 border-b-2 border-gray-600 text-center flex items-center justify-center"
+              style={{
+                height: bsSummaryHeightClass.netAssetsHeightClass,
+              }}
+            >
+              <div className={netAssetsRatio < minRatio ? "hidden" : ""}>
+                {netAssets > singleLineRatio ? (
+                  <SummaryTitleTexts
+                    titleName="純資産"
+                    valueStr={summary.net_assets.current.toLocaleString()}
+                    ratio={netAssetsRatio}
+                    singleLine={false}
+                  />
+                ) : (
+                  <SummaryTitleTexts
+                    titleName="純資産"
+                    valueStr={summary.net_assets.current.toLocaleString()}
+                    ratio={netAssetsRatio}
+                    singleLine={true}
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+        {hiddenTitles && hiddenTitles.length > 0 && (
+          <div className="flex justify-center md:justify-start">
+            <div>
+              <div className="mt-4">【非表示の項目】</div>
+              <div>
+                {hiddenTitles.map((titleData) => (
+                  <HiddenTitle
+                    key={titleData.titleName}
+                    titleData={titleData}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         )}
-      </div>
-      <div className="mt-4">(単位：{summary.unit_string})</div>
-      <div className="flex justify-center md:justify-start mt-2 w-full">
-        {/* 借方 */}
-        <div className="h-[500px] w-52">
-          {/* 流動資産 */}
-          <div
-            className="bg-red-100 border-2 border-gray-600 rounded-tl-2xl text-center flex items-center justify-center"
-            style={{ height: bsSummaryHeightClass.currentAssetsHeightClass }}
-          >
-            <div className={currentAssetsRatio < minRatio ? "hidden" : ""}>
-              {currentAssetsRatio > singleLineRatio ? (
-                <SummaryTitleTexts
-                  titleName="流動資産"
-                  valueStr={summary.current_assets.current.toLocaleString()}
-                  ratio={currentAssetsRatio}
-                  singleLine={false}
-                />
-              ) : (
-                <SummaryTitleTexts
-                  titleName="流動資産"
-                  valueStr={summary.current_assets.current.toLocaleString()}
-                  ratio={currentAssetsRatio}
-                  singleLine={false}
-                />
-              )}
-            </div>
-          </div>
-          {/* 有形固定資産 */}
-          <div
-            className="bg-blue-100 border-x-2 border-b-2 border-gray-600 text-center flex items-center justify-center"
-            style={{ height: bsSummaryHeightClass.tangibleAssetsHeightClass }}
-          >
-            <div className={tangibleAssetsRatio < minRatio ? "hidden" : ""}>
-              {tangibleAssetsRatio > singleLineRatio ? (
-                <SummaryTitleTexts
-                  titleName="有形固定資産"
-                  valueStr={summary.tangible_assets.current.toLocaleString()}
-                  ratio={tangibleAssetsRatio}
-                  singleLine={false}
-                />
-              ) : (
-                <SummaryTitleTexts
-                  titleName="有形固定資産"
-                  valueStr={summary.tangible_assets.current.toLocaleString()}
-                  ratio={tangibleAssetsRatio}
-                  singleLine={true}
-                />
-              )}
-            </div>
-          </div>
-          {/* 無形固定資産 */}
-          <div
-            className="bg-green-100 border-x-2 border-b-2 border-gray-600 text-center flex items-center justify-center"
-            style={{ height: bsSummaryHeightClass.intangibleAssetsHeightClass }}
-          >
-            <div className={intangibleAssetsRatio < minRatio ? "hidden" : ""}>
-              {intangibleAssetsRatio > singleLineRatio ? (
-                <SummaryTitleTexts
-                  titleName="無形固定資産"
-                  valueStr={summary.intangible_assets.current.toLocaleString()}
-                  ratio={intangibleAssetsRatio}
-                  singleLine={false}
-                />
-              ) : (
-                <SummaryTitleTexts
-                  titleName="無形固定資産"
-                  valueStr={summary.intangible_assets.current.toLocaleString()}
-                  ratio={intangibleAssetsRatio}
-                  singleLine={true}
-                />
-              )}
-            </div>
-          </div>
-          {/* 投資その他の資産 */}
-          <div
-            className="bg-yellow-100 rounded-bl-2xl border-x-2 border-b-2 border-gray-600 text-center flex items-center justify-center"
-            style={{
-              height: bsSummaryHeightClass.investmentsAndOtherAssetsHeightClass,
-            }}
-          >
-            <div
-              className={
-                investmentsAndOtherAssetsRatio < minRatio ? "hidden" : ""
-              }
-            >
-              {investmentsAndOtherAssetsRatio > singleLineRatio ? (
-                <SummaryTitleTexts
-                  titleName="投資その他の資産"
-                  valueStr={summary.investments_and_other_assets.current.toLocaleString()}
-                  ratio={investmentsAndOtherAssetsRatio}
-                  singleLine={false}
-                />
-              ) : (
-                <SummaryTitleTexts
-                  titleName="投資その他の資産"
-                  valueStr={summary.investments_and_other_assets.current.toLocaleString()}
-                  ratio={investmentsAndOtherAssetsRatio}
-                  singleLine={true}
-                />
-              )}
-            </div>
-          </div>
-        </div>
-        {/* 貸方 */}
-        <div className="h-[500px] w-52">
-          {/* 流動負債 */}
-          <div
-            className="bg-gray-100 rounded-tr-2xl border-y-2 border-r-2 border-gray-600 text-center flex items-center justify-center"
-            style={{
-              height: bsSummaryHeightClass.currentLiabilitiesHeightClass,
-            }}
-          >
-            <div className={currentLiabilitiesRatio < minRatio ? "hidden" : ""}>
-              {currentLiabilitiesRatio > singleLineRatio ? (
-                <SummaryTitleTexts
-                  titleName="流動負債"
-                  valueStr={summary.current_liabilities.current.toLocaleString()}
-                  ratio={currentLiabilitiesRatio}
-                  singleLine={false}
-                />
-              ) : (
-                <SummaryTitleTexts
-                  titleName="流動負債"
-                  valueStr={summary.current_liabilities.current.toLocaleString()}
-                  ratio={currentLiabilitiesRatio}
-                  singleLine={true}
-                />
-              )}
-            </div>
-          </div>
-          {/* 固定負債 */}
-          <div
-            className="bg-purple-100 border-r-2 border-b-2 border-gray-600 text-center flex items-center justify-center"
-            style={{ height: bsSummaryHeightClass.fixedLiabilitiesHeightClass }}
-          >
-            <div className={fixedLiabilitiesRatio < minRatio ? "hidden" : ""}>
-              {fixedLiabilitiesRatio > singleLineRatio ? (
-                <SummaryTitleTexts
-                  titleName="固定負債"
-                  valueStr={summary.fixed_liabilities.current.toLocaleString()}
-                  ratio={fixedLiabilitiesRatio}
-                  singleLine={false}
-                />
-              ) : (
-                <SummaryTitleTexts
-                  titleName="固定負債"
-                  valueStr={summary.fixed_liabilities.current.toLocaleString()}
-                  ratio={fixedLiabilitiesRatio}
-                  singleLine={true}
-                />
-              )}
-            </div>
-          </div>
-          {/* 純資産 */}
-          <div
-            className="bg-orange-100 rounded-br-2xl border-r-2 border-b-2 border-gray-600 text-center flex items-center justify-center"
-            style={{ height: bsSummaryHeightClass.netAssetsHeightClass }}
-          >
-            <div className={netAssetsRatio < minRatio ? "hidden" : ""}>
-              {netAssets > singleLineRatio ? (
-                <SummaryTitleTexts
-                  titleName="純資産"
-                  valueStr={summary.net_assets.current.toLocaleString()}
-                  ratio={netAssetsRatio}
-                  singleLine={false}
-                />
-              ) : (
-                <SummaryTitleTexts
-                  titleName="純資産"
-                  valueStr={summary.net_assets.current.toLocaleString()}
-                  ratio={netAssetsRatio}
-                  singleLine={true}
-                />
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-      {hiddenTitles && hiddenTitles.length > 0 && (
-        <div className="flex justify-center md:justify-start">
-          <div>
-            <div className="mt-4">【非表示の項目】</div>
-            <div>
-              {hiddenTitles.map((titleData) => (
-                <HiddenTitle key={titleData.titleName} titleData={titleData} />
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+      </>
+    );
+  };
+
+  return (
+    <div className="mb-8 w-full sm:w-[240px] lg:w-[350px] mx-auto sm:mx-0">
+      <DisclosureSummary SummaryTitle={SummaryTitleEl()} Main={MainEl()} />
     </div>
   );
 };
