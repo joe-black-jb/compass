@@ -35,7 +35,7 @@ function App() {
   return (
     <>
       <Header2 />
-      <div className="mx-10 mt-24 md:mx-16">
+      <div className="mt-20 mx-8 sm:mx-16">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
