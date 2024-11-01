@@ -86,6 +86,12 @@ export interface ReportData {
   file_name: string;
   data: string;
 }
+
+export interface ReportDataWithPeriod extends ReportData {
+  periodStart: string;
+  periodEnd: string;
+}
+
 export interface Period {
   previous: number;
   current: number;
@@ -122,6 +128,10 @@ export interface PlJson {
   sg_and_a: Period;
   sales: Period;
   operating_profit: Period;
+  operating_revenue: Period;
+  has_operating_revenue: boolean;
+  operating_cost: Period;
+  has_operating_cost: boolean;
 }
 
 export interface CfJson {
@@ -152,6 +162,8 @@ export interface PlSummaryHeightClass {
   sgAndAHeightClass: string;
   salesHeightClass: string;
   operatingProfitHeightClass: string;
+  operatingRevenueHeightClass: string;
+  operatingCostHeightClass: string;
 }
 
 export interface Fundamental {
@@ -159,6 +171,10 @@ export interface Fundamental {
   liabilities: number;
   net_assets: number;
   operating_profit: number;
+  operating_revenue: number;
+  has_operating_revenue: boolean;
+  operating_cost: number;
+  has_operating_cost: boolean;
   sales: number;
   period_start: string;
   period_end: string;
@@ -172,9 +188,6 @@ export interface TitleValue {
 
 export type ChartTitle = "SalesProfit" | "Capital" | "CashFlow";
 
-export interface ChartDescData {
-  title: string;
-  color: string;
-  isLine: boolean;
-  isLast: boolean;
-}
+export type ReportType = "BS" | "PL" | "CF";
+
+export type Sort = "asc" | "desc";

@@ -1,7 +1,9 @@
+import _ from "lodash";
 import { ValueType } from "recharts/types/component/DefaultTooltipContent";
 import {
   Fundamental,
   ReportData,
+  ReportDataWithPeriod,
   Title,
   TitleByDepth,
   TitleFamily,
@@ -151,6 +153,9 @@ export const sortFile = (
   reportData: ReportData[],
   sort?: string
 ): ReportData[] => {
+  if (reportData && reportData.length <= 1) {
+    return reportData;
+  }
   // fileName でソート
   const sortedData = reportData.sort((a, b) => {
     const fromA = getFromPeriodFromFileName(a.file_name).replace("from-", "");
@@ -192,6 +197,9 @@ export const removeDuplicates = (reportData: ReportData[]): ReportData[] => {
   const periodStrs: string[] = [];
   const result: ReportData[] = [];
 
+  if (reportData && reportData.length <= 1) {
+    return reportData;
+  }
   reportData.forEach((data) => {
     const periodStr = getPeriodFromFileName(data.file_name);
     const addedStr = periodStrs.find((str) => str === periodStr);
@@ -202,6 +210,13 @@ export const removeDuplicates = (reportData: ReportData[]): ReportData[] => {
     }
   });
   return result;
+
+  // // lodash を使用するパターン
+  // console.log("lodash 使用前: ", reportData);
+  // // const unique = _.uniqBy(reportData, "file_name");
+  // const unique = _.uniqBy(reportData, (data) => data.file_name);
+  // console.log("lodash unique: ", unique);
+  // return unique;
 };
 
 export const shortenUnitStr = (unitStr: string, value: number): string => {
@@ -237,4 +252,27 @@ export const getChartWindowStrs = (
   unitStr: string
 ): string[] => {
   return [value.toLocaleString() + unitStr, title];
+};
+
+export const getReportsWithPeriod = (
+  reports: ReportData[]
+): ReportDataWithPeriod[] => {
+  const result: ReportDataWithPeriod[] = [];
+
+  reports.forEach((report) => {
+    const periods = getPeriodsFromFileName(report.file_name);
+    if (periods && periods.length >= 2) {
+      const start = periods[0];
+      const end = periods[1];
+      const data: ReportDataWithPeriod = {
+        data: report.data,
+        file_name: report.file_name,
+        periodStart: start,
+        periodEnd: end,
+      };
+      result.push(data);
+    }
+  });
+
+  return result;
 };
