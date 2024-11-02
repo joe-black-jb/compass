@@ -8,6 +8,7 @@ import {
   Fundamental,
   ReportData,
   ReportDataWithPeriod,
+  ReportType,
 } from "../types/types";
 import api from "../api/axiosConfig";
 import { AxiosResponse } from "axios";
@@ -53,7 +54,7 @@ const CompanyDetail = () => {
   const [latestPlPeriodStart, setLatestPlPeriodStart] = useState<string>();
   const [latestPlPeriodEnd, setLatestPlPeriodEnd] = useState<string>();
   // CF
-  const [cfHtmls, setCfHtmls] = useState<ReportData[]>([]);
+  const [cfHtmls, setCfHtmls] = useState<ReportDataWithPeriod[]>([]);
   const [latestCfHtml, setLatestCfHtml] = useState<ReportData>();
   const [cfJsons, setCfJsons] = useState<ReportData[]>([]);
   const [latestCfJson, setLatestCfJson] = useState<ReportData>();
@@ -99,19 +100,11 @@ const CompanyDetail = () => {
 
   const getHtmlReports = async (company: Company, reportType: string) => {
     const result = await getReports(company, reportType, "html");
+    console.log(`${reportType} HTMLs: ${result} (${result.length} 件)`);
+
     if (result && result.length > 0) {
       const reports = result;
       const sortedReports = sortFile(reports);
-      const latest = sortedReports.pop();
-      if (latest) {
-        if (reportType === "BS") {
-          setLatestBsHtml(latest);
-        } else if (reportType === "PL") {
-          setLatestPlHtml(latest);
-        } else if (reportType === "CF") {
-          setLatestCfHtml(latest);
-        }
-      }
 
       if (sortedReports && sortedReports.length) {
         const reportsWithPeriod = getReportsWithPeriod(sortedReports);
@@ -120,7 +113,18 @@ const CompanyDetail = () => {
         } else if (reportType === "PL") {
           setPlHtmls(reportsWithPeriod);
         } else if (reportType === "CF") {
-          setCfHtmls(sortedReports);
+          setCfHtmls(reportsWithPeriod);
+        }
+      }
+
+      const latest = sortedReports.pop();
+      if (latest) {
+        if (reportType === "BS") {
+          setLatestBsHtml(latest);
+        } else if (reportType === "PL") {
+          setLatestPlHtml(latest);
+        } else if (reportType === "CF") {
+          setLatestCfHtml(latest);
         }
       }
     }
@@ -241,20 +245,33 @@ const CompanyDetail = () => {
     navigate("/");
   };
 
-  const ArrangedBsSummary = () => {
-    if (bsJsons && bsJsons.length >= 2) {
+  const ArrangedSummary = (
+    reports: ReportDataWithPeriod[],
+    reportType: ReportType
+  ) => {
+    if (reports && reports.length >= 2) {
       return (
         <div className="block">
-          {bsJsons?.map((bs) => (
-            <BsSummary
-              reportData={bs}
-              periodStart={bs.periodStart}
-              periodEnd={bs.periodEnd}
-            />
+          {reports?.map((report) => (
+            <>
+              {reportType === "BS" ? (
+                <BsSummary
+                  reportData={report}
+                  periodStart={report.periodStart}
+                  periodEnd={report.periodEnd}
+                />
+              ) : (
+                <PlSummary
+                  reportData={report}
+                  periodStart={report.periodStart}
+                  periodEnd={report.periodEnd}
+                />
+              )}
+            </>
           ))}
         </div>
       );
-    } else if (latestBsJson && latestBsHtml) {
+    } else if (latestBsJson && latestBsHtml && reportType === "BS") {
       return (
         <BsSummary
           reportData={latestBsJson}
@@ -262,25 +279,7 @@ const CompanyDetail = () => {
           periodEnd={latestBsPeriodEnd}
         />
       );
-    } else {
-      return <NoSummary reportType="貸借対照表" />;
-    }
-  };
-
-  const ArrangedPlSummary = () => {
-    if (plJsons && plJsons.length >= 2) {
-      return (
-        <div className="block">
-          {plJsons?.map((pl) => (
-            <PlSummary
-              reportData={pl}
-              periodStart={pl.periodStart}
-              periodEnd={pl.periodEnd}
-            />
-          ))}
-        </div>
-      );
-    } else if (latestPlJson && latestPlHtml) {
+    } else if (latestPlJson && latestPlHtml && reportType === "PL") {
       return (
         <PlSummary
           reportData={latestPlJson}
@@ -288,6 +287,8 @@ const CompanyDetail = () => {
           periodEnd={latestPlPeriodEnd}
         />
       );
+    } else if (reportType === "BS") {
+      return <NoSummary reportType="貸借対照表" />;
     } else {
       return <NoSummary reportType="損益計算書" />;
     }
@@ -305,7 +306,6 @@ const CompanyDetail = () => {
     return <SummaryTitle title={periodStr} disablePeriod={true} />;
   };
 
-  // ここに個々のHTMLを設置
   const MainEl = (report: ReportData): JSX.Element => {
     return (
       <div className="flex justify-center">
@@ -314,12 +314,14 @@ const CompanyDetail = () => {
     );
   };
 
-  const ArrangedBsHtml = () => {
-    // 2件以上
-    if (bsHtmls && bsHtmls.length >= 2) {
+  const ArrangedHtml = (
+    reports: ReportDataWithPeriod[],
+    latestReport?: ReportData
+  ) => {
+    if (reports && reports.length >= 2) {
       return (
         <>
-          {bsHtmls?.map((report) => {
+          {reports?.map((report) => {
             return (
               <div className="mb-8">
                 <DisclosureSummary
@@ -331,12 +333,12 @@ const CompanyDetail = () => {
           })}
         </>
       );
-    } else if (latestBsHtml && latestBsHtml.data) {
+    } else if (latestReport && latestReport.data) {
       return (
         <div className="mb-8">
           <DisclosureSummary
-            SummaryTitle={TitleEl(latestBsHtml)}
-            Main={MainEl(latestBsHtml)}
+            SummaryTitle={TitleEl(latestReport)}
+            Main={MainEl(latestReport)}
           ></DisclosureSummary>
         </div>
       );
@@ -344,38 +346,6 @@ const CompanyDetail = () => {
       return <div>該当データなし</div>;
     }
   };
-
-  const ArrangedPlHtml = () => {
-    if (plHtmls && plHtmls.length >= 2) {
-      return (
-        <>
-          {plHtmls?.map((report) => {
-            return (
-              <div className="mb-8">
-                <DisclosureSummary
-                  SummaryTitle={TitleEl(report)}
-                  Main={MainEl(report)}
-                />
-              </div>
-            );
-          })}
-        </>
-      );
-    } else if (latestPlHtml && latestPlHtml.data) {
-      return (
-        <div className="mb-8">
-          <DisclosureSummary
-            SummaryTitle={TitleEl(latestPlHtml)}
-            Main={MainEl(latestPlHtml)}
-          ></DisclosureSummary>
-        </div>
-      );
-    } else {
-      return <div>該当データなし</div>;
-    }
-  };
-
-  // TODO: ArrangedBsHtml と ArrangedPlHtml を関数化
 
   return (
     <div className="mb-20">
@@ -393,8 +363,8 @@ const CompanyDetail = () => {
         <div className="xl:flex xl:justify-between sm:w-full xl:w-[50%]">
           <div className="sm:flex sm:justify-center sm:w-full mx-auto xl:ml-[20%] xl:w-[600px]">
             {/* 比例縮尺図コンポーネント */}
-            <ArrangedBsSummary />
-            <ArrangedPlSummary />
+            {ArrangedSummary(bsJsons, "BS")}
+            {ArrangedSummary(plJsons, "PL")}
           </div>
 
           <div>
@@ -427,18 +397,15 @@ const CompanyDetail = () => {
 
         {/* dangerouslySetInnerHTML を使って HTML をレンダリング */}
         <div className="xl:flex">
+          {/* 貸借対照表 */}
           <TitleMarker title="貸借対照表" />
-          <ArrangedBsHtml />
+          {ArrangedHtml(bsHtmls, latestBsHtml)}
+          {/* 損益計算書 */}
           <TitleMarker title="損益計算書" />
-          <ArrangedPlHtml />
-          {latestCfHtml && latestCfHtml.data && (
-            <div className="xl:mr-8">
-              <TitleMarker title="キャッシュ・フロー計算書" />
-              <div className="flex justify-center">
-                <div dangerouslySetInnerHTML={{ __html: latestCfHtml.data }} />
-              </div>
-            </div>
-          )}
+          {ArrangedHtml(plHtmls, latestPlHtml)}
+          {/* CF計算書 */}
+          <TitleMarker title="キャッシュ・フロー計算書" />
+          {ArrangedHtml(cfHtmls, latestCfHtml)}
         </div>
       </Suspense>
     </div>
