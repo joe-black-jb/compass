@@ -5,10 +5,11 @@ interface Props {
   periodStart?: string;
   periodEnd?: string;
   disablePeriod?: boolean;
+  noData?: boolean;
 }
 
 const SummaryTitle = (props: Props) => {
-  const { title, periodStart, periodEnd, disablePeriod } = props;
+  const { title, periodStart, periodEnd, disablePeriod, noData } = props;
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -48,6 +49,7 @@ const SummaryTitle = (props: Props) => {
       {!periodStart && !periodEnd && !disablePeriod && (
         <div className="text-center">(該当期間なし)</div>
       )}
+      {noData && <div className="text-center">(該当データなし)</div>}
     </div>
   );
 };
