@@ -28,7 +28,7 @@ const DisclosureSummary = (props: Props) => {
             leaveFrom="opacity-100"
             leaveTo="max-h-0 opacity-0"
           >
-            <DisclosurePanel className="px-4 pt-4 pb-2 text-sm text-gray-900 min-h-[800px]">
+            <DisclosurePanel className="px-4 pt-4 pb-2 text-sm text-gray-900 min-h-[700px]">
               {Main}
             </DisclosurePanel>
           </Transition>
