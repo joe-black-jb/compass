@@ -253,7 +253,7 @@ const PlSummary = (props: Props) => {
         <div className="mt-4">(単位：{summary.unit_string})</div>
         <div className="flex justify-center md:justify-start mt-2 w-full">
           {/* 借方 */}
-          <div className="h-[500px] w-52">
+          <div className="h-[400px] w-52">
             {hasOperatingRevenueAndCost ? (
               <>
                 {/* 営業費用 */}
@@ -365,7 +365,7 @@ const PlSummary = (props: Props) => {
             )}
           </div>
           {/* 貸方 */}
-          <div className="h-[500px] w-52">
+          <div className="h-[400px] w-52">
             {hasOperatingRevenueAndCost ? (
               <>
                 {/* 営業収益 */}

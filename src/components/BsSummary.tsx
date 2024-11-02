@@ -191,7 +191,7 @@ const BsSummary = (props: Props) => {
         <div className="mt-4">(単位：{summary.unit_string})</div>
         <div className="flex justify-center md:justify-start mt-2 w-full">
           {/* 借方 */}
-          <div className="h-[500px] w-52">
+          <div className="h-[400px] w-52">
             {/* 流動資産 */}
             <div
               className="bg-red-100 border-2 border-gray-600 rounded-tl-2xl text-center flex items-center justify-center"
@@ -299,7 +299,7 @@ const BsSummary = (props: Props) => {
             </div>
           </div>
           {/* 貸方 */}
-          <div className="h-[500px] w-52">
+          <div className="h-[400px] w-52">
             {/* 流動負債 */}
             <div
               className="bg-gray-100 rounded-tr-2xl border-y-2 border-r-2 border-gray-600 text-center flex items-center justify-center"
