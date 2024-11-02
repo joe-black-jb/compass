@@ -1,15 +1,28 @@
+import { useState } from "react";
+
 interface Props {
   title: string;
   periodStart?: string;
   periodEnd?: string;
-  open?: boolean;
+  disablePeriod?: boolean;
 }
 
 const SummaryTitle = (props: Props) => {
-  const { title, periodStart, periodEnd, open } = props;
+  const { title, periodStart, periodEnd, disablePeriod } = props;
+
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  const toggleSummary = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const open = isOpen;
 
   return (
-    <div className="relative bg-green-300 font-bold rounded-xl py-2 px-2">
+    <div
+      className="relative bg-green-300 font-bold rounded-xl py-2 px-2"
+      onClick={toggleSummary}
+    >
       <svg
         className={`absolute top-2 w-5 h-5 transform ${
           open ? "rotate-0" : "-rotate-90"
@@ -27,11 +40,12 @@ const SummaryTitle = (props: Props) => {
         />
       </svg>
       <div className="text-center">{title}</div>
-      {periodStart && periodEnd ? (
+      {periodStart && periodEnd && (
         <div className="text-center">
           ({periodStart} ~ {periodEnd})
         </div>
-      ) : (
+      )}
+      {!periodStart && !periodEnd && !disablePeriod && (
         <div className="text-center">(該当期間なし)</div>
       )}
     </div>

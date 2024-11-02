@@ -17,13 +17,15 @@ const DisclosureSummary = (props: Props) => {
     <Disclosure>
       {({ open }) => (
         <>
-          <DisclosureButton as="div">{SummaryTitle}</DisclosureButton>
+          <DisclosureButton as="div" className="cursor-pointer">
+            {SummaryTitle}
+          </DisclosureButton>
           <Transition
             enter="transition-all duration-300 ease-in-out"
             enterFrom="max-h-0 opacity-0"
-            enterTo="max-h-screen opacity-100"
+            enterTo="opacity-100"
             leave="transition-all duration-300 ease-in-out"
-            leaveFrom="max-h-screen opacity-100"
+            leaveFrom="opacity-100"
             leaveTo="max-h-0 opacity-0"
           >
             <DisclosurePanel className="px-4 pt-4 pb-2 text-sm text-gray-900">

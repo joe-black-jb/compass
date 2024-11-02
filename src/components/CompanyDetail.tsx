@@ -28,6 +28,8 @@ import CashFlow from "./CashFlow";
 import TitleMarker from "./TitleMarker";
 import Button from "./Button";
 import NoSummary from "./NoSummary";
+import SummaryTitle from "./SummaryTitle";
+import DisclosureSummary from "./DisclosureSummary";
 
 const CompanyDetail = () => {
   const navigate = useNavigate();
@@ -291,6 +293,90 @@ const CompanyDetail = () => {
     }
   };
 
+  const TitleEl = (report: ReportData): JSX.Element => {
+    let periodStr = "";
+    const periods = getPeriodsFromFileName(report.file_name);
+    if (periods && periods.length >= 2) {
+      const start = periods[0];
+      const end = periods[1];
+      periodStr = `${start} ~ ${end}`;
+    }
+
+    return <SummaryTitle title={periodStr} disablePeriod={true} />;
+  };
+
+  // ここに個々のHTMLを設置
+  const MainEl = (report: ReportData): JSX.Element => {
+    return (
+      <div className="flex justify-center">
+        <div dangerouslySetInnerHTML={{ __html: report.data }} />
+      </div>
+    );
+  };
+
+  const ArrangedBsHtml = () => {
+    // 2件以上
+    if (bsHtmls && bsHtmls.length >= 2) {
+      return (
+        <>
+          {bsHtmls?.map((report) => {
+            return (
+              <div className="mb-8">
+                <DisclosureSummary
+                  SummaryTitle={TitleEl(report)}
+                  Main={MainEl(report)}
+                ></DisclosureSummary>
+              </div>
+            );
+          })}
+        </>
+      );
+    } else if (latestBsHtml && latestBsHtml.data) {
+      return (
+        <div className="mb-8">
+          <DisclosureSummary
+            SummaryTitle={TitleEl(latestBsHtml)}
+            Main={MainEl(latestBsHtml)}
+          ></DisclosureSummary>
+        </div>
+      );
+    } else {
+      return <div>該当データなし</div>;
+    }
+  };
+
+  const ArrangedPlHtml = () => {
+    if (plHtmls && plHtmls.length >= 2) {
+      return (
+        <>
+          {plHtmls?.map((report) => {
+            return (
+              <div className="mb-8">
+                <DisclosureSummary
+                  SummaryTitle={TitleEl(report)}
+                  Main={MainEl(report)}
+                />
+              </div>
+            );
+          })}
+        </>
+      );
+    } else if (latestPlHtml && latestPlHtml.data) {
+      return (
+        <div className="mb-8">
+          <DisclosureSummary
+            SummaryTitle={TitleEl(latestPlHtml)}
+            Main={MainEl(latestPlHtml)}
+          ></DisclosureSummary>
+        </div>
+      );
+    } else {
+      return <div>該当データなし</div>;
+    }
+  };
+
+  // TODO: ArrangedBsHtml と ArrangedPlHtml を関数化
+
   return (
     <div className="mb-20">
       <div className="flex justify-between">
@@ -341,22 +427,10 @@ const CompanyDetail = () => {
 
         {/* dangerouslySetInnerHTML を使って HTML をレンダリング */}
         <div className="xl:flex">
-          {latestBsHtml && latestBsHtml.data && (
-            <div className="xl:mr-8">
-              <TitleMarker title="貸借対照表" />
-              <div className="flex justify-center">
-                <div dangerouslySetInnerHTML={{ __html: latestBsHtml.data }} />
-              </div>
-            </div>
-          )}
-          {latestPlHtml && latestPlHtml.data && (
-            <div className="xl:mr-8">
-              <TitleMarker title="損益計算書" />
-              <div className="flex justify-center">
-                <div dangerouslySetInnerHTML={{ __html: latestPlHtml.data }} />
-              </div>
-            </div>
-          )}
+          <TitleMarker title="貸借対照表" />
+          <ArrangedBsHtml />
+          <TitleMarker title="損益計算書" />
+          <ArrangedPlHtml />
           {latestCfHtml && latestCfHtml.data && (
             <div className="xl:mr-8">
               <TitleMarker title="キャッシュ・フロー計算書" />
