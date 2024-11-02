@@ -149,6 +149,11 @@ const CompanyDetail = () => {
       if (latest) {
         setEachCallback(latest);
 
+        if (reportType === "CF" && latest.data) {
+          const cfJson: CfJson = JSON.parse(latest.data);
+          setCfUnitStr(cfJson.unit_string);
+        }
+
         const periods = getPeriodsFromFileName(latest.file_name);
         if (periods && periods.length >= 2) {
           if (reportType === "BS") {

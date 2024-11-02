@@ -238,7 +238,12 @@ export const shortenUnitStr = (unitStr: string, value: number): string => {
     }
     return tickItemStr;
   } else if (unitStr.includes("千")) {
+    // 1,000,000 以上 or -1,000,000 以下の場合
     if (value >= 1000000 || value <= -1000000) {
+      return `${value / 100000}億`;
+    }
+    // 100,000 以上 or -100,000 以下の場合
+    if (value >= 100000 || value <= -100000) {
       return `${value / 100000}億`;
     }
     return tickItemStr;
