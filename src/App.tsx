@@ -46,6 +46,7 @@ function App() {
             element={<CompanyTitleEdit />}
           />
           <Route path="/company/:companyId" element={<CompanyDetail />} />
+          <Route path="/company/:companyId/all" element={<CompanyDetail />} />
           <Route
             path="/company/:companyId/loggedIn"
             element={<CompanyDetail />}

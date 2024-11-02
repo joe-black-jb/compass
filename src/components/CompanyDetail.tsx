@@ -1,5 +1,5 @@
 import { Suspense, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import {
   BsJson,
@@ -32,9 +32,15 @@ import Button from "./Button";
 import NoSummary from "./NoSummary";
 import SummaryTitle from "./SummaryTitle";
 import DisclosureSummary from "./DisclosureSummary";
+import DataTypeIcon from "./DataTypeIcon";
 
 const CompanyDetail = () => {
   const navigate = useNavigate();
+
+  const location = useLocation();
+  const paths = location.pathname.split("/");
+  const lastPath = paths.pop();
+  const showAllData = lastPath === "all";
 
   const [company, setCompany] = useState<Company>();
   const { companyId } = useParams();
@@ -82,7 +88,6 @@ const CompanyDetail = () => {
       getJsonReports(company, "PL", setPlJsons, setLatestPlJson);
       // CF
       getHtmlReports(company, "CF", setCfHtmls, setLatestCfHtml);
-      // getCfJsonReports(company);
       getJsonReports(company, "CF", setCfJsons, setLatestCfJson);
       // Fundamental
       getFundamentals(company);
@@ -216,14 +221,14 @@ const CompanyDetail = () => {
   };
 
   const goBack = () => {
-    navigate("/");
+    navigate(-1);
   };
 
   const ArrangedSummary = (
     reports: ReportDataWithPeriod[],
     reportType: ReportType
   ) => {
-    if (reports && reports.length >= 2) {
+    if (reports && reports.length >= 2 && showAllData) {
       return (
         <div className="block">
           {reports?.map((report) => (
@@ -262,9 +267,13 @@ const CompanyDetail = () => {
         />
       );
     } else if (reportType === "BS") {
-      return <NoSummary reportType="貸借対照表" />;
+      return (
+        <NoSummary reportType="貸借対照表" disablePeriod={true} noData={true} />
+      );
     } else {
-      return <NoSummary reportType="損益計算書" />;
+      return (
+        <NoSummary reportType="損益計算書" disablePeriod={true} noData={true} />
+      );
     }
   };
 
@@ -292,7 +301,7 @@ const CompanyDetail = () => {
     reports: ReportDataWithPeriod[],
     latestReport?: ReportData
   ) => {
-    if (reports && reports.length >= 2) {
+    if (reports && reports.length >= 2 && showAllData) {
       return (
         <>
           {reports?.map((report) => {
@@ -317,21 +326,32 @@ const CompanyDetail = () => {
         </div>
       );
     } else {
-      return <div>該当データなし</div>;
+      return <div className="text-center">該当データなし</div>;
     }
+  };
+
+  const goToAll = () => {
+    navigate(`/company/${companyId}/all`);
   };
 
   return (
     <div className="mb-20">
       <div className="flex justify-between">
         <Button label="戻る" className="border-[1px]" onClick={goBack} />
-        {/* <Button
-          label="異なる年度のデータ"
-          className="border-[1px]"
-          onClick={goOther}
-        /> */}
+        {!showAllData && (
+          <Button
+            label="全データを見る"
+            className="border-[1px]"
+            onClick={goToAll}
+          />
+        )}
       </div>
       <Suspense fallback={<div>Loading...</div>}>
+        {!showAllData && (
+          <div className="w-fit mx-auto mt-4">
+            <DataTypeIcon text="最新データ" />
+          </div>
+        )}
         <div className="mt-4 text-center">{company?.name}</div>
         <TitleMarker title="比例縮尺図" />
         <div className="xl:flex xl:justify-between sm:w-full xl:w-[50%]">
