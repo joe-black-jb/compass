@@ -15,7 +15,7 @@ export default function Header2() {
           </a> */}
           <a
             href="/"
-            className="px-2 text-gray-600 h-[56px] hover:bg-green-300 rounded-lg font-bold content-center"
+            className="px-2 text-gray-900 h-[56px] hover:bg-green-300 rounded-lg font-bold content-center"
           >
             Compass 〜財務諸表データ検索アプリ〜
           </a>
