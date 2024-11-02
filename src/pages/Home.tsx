@@ -76,7 +76,7 @@ const Home = () => {
           if (companies && companies.length > 0) {
             setSearchedCompanies(companies);
           }
-          console.log(`「${companyName}」で検索した結果: ${res.data}`);
+          // console.log(`「${companyName}」で検索した結果: ${res.data}`);
         });
     } else {
       setCompanyName("");
@@ -100,7 +100,7 @@ const Home = () => {
 
   return (
     <>
-      <div className="flex justify-center mb-10">
+      <div className="flex justify-center mb-8">
         <SearchInput
           value={companyName}
           onChange={handleChangeCompanyName}
@@ -109,18 +109,11 @@ const Home = () => {
         />
       </div>
       <Suspense fallback={<div>Loading...</div>}>
-        <div className="relative overflow-x-auto">
+        <div className="bg-gray-200 text-gray-700 font-bold border-b border-gray-700 pl-2 py-2">
+          企業名
+        </div>
+        <div className="relative overflow-x-auto  max-h-[600px]">
           <table className="w-full text-sm text-left text-gray-700">
-            <thead className="text-xs text-gray-700 uppercase font-bold">
-              <tr className="border-b border-gray-700">
-                <th scope="col" className="px-6 py-3">
-                  企業名
-                </th>
-                <th scope="col" className="px-6 py-3">
-                  資料
-                </th>
-              </tr>
-            </thead>
             {displayCompanies.length > 0 &&
               displayCompanies.map((company) => {
                 return (
@@ -140,14 +133,14 @@ const Home = () => {
                         </div>
                       </td>
                       {/* 資料 */}
-                      <td className="flex px-6 py-4">
+                      {/* <td className="flex px-6 py-4">
                         {company.bs === 1 && (
                           <ReportIcon label="B/S" color="green" />
                         )}
                         {company.pl === 1 && (
                           <ReportIcon label="P/L" color="blue" />
                         )}
-                      </td>
+                      </td> */}
                     </tr>
                   </tbody>
                 );
