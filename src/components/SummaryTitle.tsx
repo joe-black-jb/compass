@@ -21,7 +21,7 @@ const SummaryTitle = (props: Props) => {
 
   return (
     <div
-      className="relative bg-green-300 font-bold rounded-xl py-2 px-2"
+      className="relative bg-green-300 font-bold text-sm rounded-xl py-2 px-2"
       onClick={toggleSummary}
     >
       <svg
