@@ -9,6 +9,7 @@ import {
   ReportData,
   ReportDataWithPeriod,
   ReportType,
+  Sort,
 } from "../types/types";
 import api from "../api/axiosConfig";
 import { AxiosResponse } from "axios";
@@ -56,17 +57,14 @@ const CompanyDetail = () => {
   // CF
   const [cfHtmls, setCfHtmls] = useState<ReportDataWithPeriod[]>([]);
   const [latestCfHtml, setLatestCfHtml] = useState<ReportData>();
-  const [cfJsons, setCfJsons] = useState<ReportData[]>([]);
+  const [cfJsons, setCfJsons] = useState<ReportDataWithPeriod[]>([]);
   const [latestCfJson, setLatestCfJson] = useState<ReportData>();
-  const [cfPeriodStrs, setCfPeriodStrs] = useState<string[]>([]);
   const [cfUnitStr, setCfUnitStr] = useState<string>("");
   // Fundamental
   const [fundamentals, setFundamentals] = useState<Fundamental[]>([]);
   const [hasOperatingRevenueAndCost, setHasOperatingRevenueAndCost] =
     useState<boolean>(false);
 
-  const [periodStart, setPeriodStart] = useState<string>();
-  const [periodEnd, setPeriodEnd] = useState<string>();
   const [unitStr, setUnitStr] = useState<string>("");
 
   useEffect(() => {
@@ -77,14 +75,15 @@ const CompanyDetail = () => {
   useEffect(() => {
     if (company) {
       // BS
-      getHtmlReports(company, "BS");
-      getJsonReports(company, "BS");
+      getHtmlReports(company, "BS", setBsHtmls, setLatestBsHtml);
+      getJsonReports(company, "BS", setBsJsons, setLatestBsJson);
       // PL
-      getHtmlReports(company, "PL");
-      getJsonReports(company, "PL");
+      getHtmlReports(company, "PL", setPlHtmls, setLatestPlHtml);
+      getJsonReports(company, "PL", setPlJsons, setLatestPlJson);
       // CF
-      getHtmlReports(company, "CF");
-      getCfJsonReports(company);
+      getHtmlReports(company, "CF", setCfHtmls, setLatestCfHtml);
+      // getCfJsonReports(company);
+      getJsonReports(company, "CF", setCfJsons, setLatestCfJson);
       // Fundamental
       getFundamentals(company);
     }
@@ -98,9 +97,14 @@ const CompanyDetail = () => {
     });
   };
 
-  const getHtmlReports = async (company: Company, reportType: string) => {
+  const getHtmlReports = async (
+    company: Company,
+    reportType: string,
+    setAllCallback: (reports: ReportDataWithPeriod[]) => void,
+    setEachCallback: (report: ReportData) => void
+  ) => {
     const result = await getReports(company, reportType, "html");
-    console.log(`${reportType} HTMLs: ${result} (${result.length} 件)`);
+    // console.log(`${reportType} HTMLs: ${result} (${result.length} 件)`);
 
     if (result && result.length > 0) {
       const reports = result;
@@ -108,41 +112,37 @@ const CompanyDetail = () => {
 
       if (sortedReports && sortedReports.length) {
         const reportsWithPeriod = getReportsWithPeriod(sortedReports);
-        if (reportType === "BS") {
-          setBsHtmls(reportsWithPeriod);
-        } else if (reportType === "PL") {
-          setPlHtmls(reportsWithPeriod);
-        } else if (reportType === "CF") {
-          setCfHtmls(reportsWithPeriod);
-        }
+        setAllCallback(reportsWithPeriod);
       }
 
       const latest = sortedReports.pop();
       if (latest) {
-        if (reportType === "BS") {
-          setLatestBsHtml(latest);
-        } else if (reportType === "PL") {
-          setLatestPlHtml(latest);
-        } else if (reportType === "CF") {
-          setLatestCfHtml(latest);
-        }
+        setEachCallback(latest);
       }
     }
   };
 
-  const getJsonReports = async (company: Company, reportType: string) => {
+  const getJsonReports = async (
+    company: Company,
+    reportType: string,
+    setAllCallback: (reports: ReportDataWithPeriod[]) => void,
+    setEachCallback: (report: ReportData) => void,
+    sort?: Sort
+  ) => {
     const reports = await getReports(company, reportType, "json");
 
     if (reports && reports.length > 0) {
       const uniqueReports = removeDuplicates(reports);
-      const sortedReports = sortFile(uniqueReports, "desc");
+      const sortedReports = sortFile(uniqueReports, sort);
+
+      if (sortedReports && sortedReports.length) {
+        const reportsWithPeriod = getReportsWithPeriod(sortedReports);
+        setAllCallback(reportsWithPeriod);
+      }
+
       const latest = sortedReports.pop();
       if (latest) {
-        if (reportType === "BS") {
-          setLatestBsJson(latest);
-        } else if (reportType === "PL") {
-          setLatestPlJson(latest);
-        }
+        setEachCallback(latest);
 
         const periods = getPeriodsFromFileName(latest.file_name);
         if (periods && periods.length >= 2) {
@@ -158,32 +158,6 @@ const CompanyDetail = () => {
             setLatestPlPeriodStart(periods[0]);
             setLatestPlPeriodEnd(periods[1]);
           }
-        }
-      }
-
-      if (sortedReports && sortedReports.length) {
-        const reportsWithPeriod = getReportsWithPeriod(sortedReports);
-
-        if (reportType === "BS") {
-          setBsJsons(reportsWithPeriod);
-        } else if (reportType === "PL") {
-          setPlJsons(reportsWithPeriod);
-        }
-      }
-    }
-  };
-
-  const getCfJsonReports = async (company: Company) => {
-    const reports = await getReports(company, "CF", "json");
-    if (reports && reports.length > 0) {
-      const unique = removeDuplicates(reports);
-      const sortedReports = sortFile(unique);
-      setCfJsons(sortedReports);
-      const latest = sortedReports[0];
-      if (latest && latest.data) {
-        const cfJson: CfJson = JSON.parse(latest.data);
-        if (cfJson.unit_string && !cfUnitStr) {
-          setCfUnitStr(cfJson.unit_string);
         }
       }
     }
