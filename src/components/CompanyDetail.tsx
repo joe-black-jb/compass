@@ -341,7 +341,7 @@ const CompanyDetail = () => {
 
   return (
     <div className="mb-20">
-      <div className="flex justify-between">
+      <div className="fixed bottom-0 py-6 w-[85%] bg-white z-10 flex justify-between">
         <Button label="戻る" className="border-[1px]" onClick={goBack} />
         {!showAllData && (
           <Button
