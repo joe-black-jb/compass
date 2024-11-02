@@ -2,10 +2,12 @@ import SummaryTitle from "./SummaryTitle";
 
 interface Props {
   reportType: string;
+  disablePeriod?: boolean;
+  noData?: boolean;
 }
 
 const NoSummary = (props: Props) => {
-  const { reportType } = props;
+  const { reportType, disablePeriod, noData } = props;
 
   let containerClassName =
     "mb-20 w-full sm:w-[240px] lg:w-[350px] mx-auto sm:mx-0";
@@ -16,11 +18,11 @@ const NoSummary = (props: Props) => {
 
   return (
     <div className={containerClassName}>
-      <SummaryTitle title={reportType} />
-      <div className="mt-4">(単位：)</div>
-      <div className="h-[500px] w-full mt-2 bg-gray-400 border-2 border-gray-600 rounded-2xl text-center leading-[500px] ">
-        表示するデータがありません
-      </div>
+      <SummaryTitle
+        title={reportType}
+        disablePeriod={disablePeriod}
+        noData={noData}
+      />
     </div>
   );
 };
