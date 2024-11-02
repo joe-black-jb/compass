@@ -13,11 +13,22 @@ import {
 import {
   barSize,
   bluePurple,
+  CAPITAL_SUM,
   chartMarginLeft,
   chartMarginRight,
+  FINANCING_CASH_FLOW,
+  FREE_CASH_FLOW,
   gold,
   green,
+  INVESTING_CASH_FLOW,
+  LIABILITIES,
+  NET_ASSETS,
+  OPERATING_CASH_FLOW,
+  OPERATING_PROFIT,
+  OPERATING_PROFIT_RATIO,
   orange,
+  OWNED_CAPITAL_RATIO,
+  SALES,
 } from "../constants/constants";
 import { getChartWindowStrs, shortenUnitStr } from "../utils/funcs";
 import { ChartTitle } from "../types/types";
@@ -59,46 +70,42 @@ const Chart = (props: Props) => {
             />
             <Tooltip
               formatter={(value, name) => {
-                if (name === "sales")
-                  return getChartWindowStrs("売上高", value, unitStr);
-                if (name === "operatingProfit")
-                  return getChartWindowStrs("営業利益", value, unitStr);
-                if (name === "operatingProfitRatio")
-                  return [`${value}%`, "売上高営業利益率"];
-                if (name === "capitalSum")
-                  return getChartWindowStrs("資本合計", value, unitStr);
-                if (name === "netAssets")
-                  return getChartWindowStrs("純資産", value, unitStr);
-                if (name === "liabilities")
-                  return getChartWindowStrs("負債", value, unitStr);
-                if (name === "ownedCapitalRatio")
-                  return [`${value}%`, "自己資本比率"];
-                if (name === "operatingCf")
+                if (name === SALES)
+                  return getChartWindowStrs(SALES, value, unitStr);
+                if (name === OPERATING_PROFIT)
+                  return getChartWindowStrs(OPERATING_PROFIT, value, unitStr);
+                if (name === OPERATING_PROFIT_RATIO)
+                  return [`${value}%`, OPERATING_PROFIT_RATIO];
+                if (name === CAPITAL_SUM)
+                  return getChartWindowStrs(CAPITAL_SUM, value, unitStr);
+                if (name === NET_ASSETS)
+                  return getChartWindowStrs(NET_ASSETS, value, unitStr);
+                if (name === LIABILITIES)
+                  return getChartWindowStrs(LIABILITIES, value, unitStr);
+                if (name === OWNED_CAPITAL_RATIO)
+                  return [`${value}%`, OWNED_CAPITAL_RATIO];
+                if (name === OPERATING_CASH_FLOW)
                   return getChartWindowStrs(
-                    "営業キャッシュフロー",
+                    OPERATING_CASH_FLOW,
                     value,
                     unitStr
                   );
-                if (name === "investingCf")
+                if (name === INVESTING_CASH_FLOW)
                   return getChartWindowStrs(
-                    "投資キャッシュフロー",
-                    value,
-                    unitStr
-                  );
-
-                if (name === "financingCf")
-                  return getChartWindowStrs(
-                    "財務キャッシュフロー",
+                    INVESTING_CASH_FLOW,
                     value,
                     unitStr
                   );
 
-                if (name === "freeCf")
+                if (name === FINANCING_CASH_FLOW)
                   return getChartWindowStrs(
-                    "フリーキャッシュフロー",
+                    FINANCING_CASH_FLOW,
                     value,
                     unitStr
                   );
+
+                if (name === FREE_CASH_FLOW)
+                  return getChartWindowStrs(FREE_CASH_FLOW, value, unitStr);
                 return [value, name];
               }}
             />
@@ -106,21 +113,21 @@ const Chart = (props: Props) => {
             {chartTitle === "SalesProfit" && (
               <>
                 <Bar
-                  name="売上高"
+                  name={SALES}
                   dataKey="sales"
                   fill={bluePurple}
                   yAxisId="left"
                   barSize={barSize}
                 />
                 <Bar
-                  name="営業利益"
+                  name={OPERATING_PROFIT}
                   dataKey="operatingProfit"
                   fill={green}
                   yAxisId="left"
                   barSize={barSize}
                 />
                 <Line
-                  name="売上高営業利益率"
+                  name={OPERATING_PROFIT_RATIO}
                   type="linear"
                   dataKey="operatingProfitRatio"
                   yAxisId="right"
@@ -131,28 +138,28 @@ const Chart = (props: Props) => {
             {chartTitle === "Capital" && (
               <>
                 <Bar
-                  name="資本合計"
+                  name={CAPITAL_SUM}
                   dataKey="capitalSum"
                   fill={bluePurple}
                   yAxisId="left"
                   barSize={barSize}
                 />
                 <Bar
-                  name="純資産"
+                  name={NET_ASSETS}
                   dataKey="netAssets"
                   fill={green}
                   yAxisId="left"
                   barSize={barSize}
                 />
                 <Bar
-                  name="負債"
+                  name={LIABILITIES}
                   dataKey="liabilities"
                   fill={gold}
                   yAxisId="left"
                   barSize={barSize}
                 />
                 <Line
-                  name="自己資本比率"
+                  name={OWNED_CAPITAL_RATIO}
                   type="linear"
                   dataKey="ownedCapitalRatio"
                   yAxisId="right"
@@ -163,28 +170,28 @@ const Chart = (props: Props) => {
             {chartTitle === "CashFlow" && (
               <>
                 <Bar
-                  name="営業CF"
+                  name={OPERATING_CASH_FLOW}
                   dataKey="operatingCf"
                   fill={bluePurple}
                   yAxisId="left"
                   barSize={barSize}
                 />
                 <Bar
-                  name="投資CF"
+                  name={INVESTING_CASH_FLOW}
                   dataKey="investingCf"
                   fill={green}
                   yAxisId="left"
                   barSize={barSize}
                 />
                 <Bar
-                  name="財務CF"
+                  name={FINANCING_CASH_FLOW}
                   dataKey="financingCf"
                   fill={gold}
                   yAxisId="left"
                   barSize={barSize}
                 />
                 <Bar
-                  name="フリーCF"
+                  name={FREE_CASH_FLOW}
                   dataKey="freeCf"
                   fill={orange}
                   yAxisId="left"
