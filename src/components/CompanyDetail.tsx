@@ -95,7 +95,7 @@ const CompanyDetail = () => {
   }, [company]);
 
   const getCompany = () => {
-    api.get(`/company/${companyId}`).then((result: AxiosResponse) => {
+    api.get(`/private/company/${companyId}`).then((result: AxiosResponse) => {
       if (result.data) {
         setCompany(result.data);
       }
@@ -178,7 +178,7 @@ const CompanyDetail = () => {
     reportType: string,
     extension: string
   ): Promise<ReportData[]> => {
-    const result = await api.get(`/reports`, {
+    const result = await api.get(`/public/reports`, {
       params: {
         EDINETCode: company?.edinetCode,
         reportType,
@@ -192,7 +192,7 @@ const CompanyDetail = () => {
 
   const getFundamentals = async (company: Company) => {
     api
-      .get("/fundamentals", {
+      .get("/public/fundamentals", {
         params: {
           EDINETCode: company.edinetCode,
           periodStart: 2017,
