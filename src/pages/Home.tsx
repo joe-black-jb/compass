@@ -114,7 +114,7 @@ const Home = () => {
         </div>
         <div className="relative overflow-x-auto  max-h-[600px]">
           <table className="w-full text-sm text-left text-gray-700">
-            {displayCompanies.length > 0 &&
+            {displayCompanies?.length > 0 &&
               displayCompanies.map((company) => {
                 return (
                   <tbody key={company.id}>
