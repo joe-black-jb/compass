@@ -66,7 +66,7 @@ const Home = () => {
   const handleSearch = () => {
     if (companyName) {
       api
-        .get("/search/companies", {
+        .get("/private/search", {
           params: {
             companyName,
           },
