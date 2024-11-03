@@ -25,7 +25,7 @@ const Home = () => {
 
   const getCompanies = () => {
     api
-      .get("/companies", {
+      .get("/private/companies", {
         params: {
           limit: 50,
         },
@@ -41,7 +41,7 @@ const Home = () => {
 
   const getAllCompanies = () => {
     api
-      .get("/companies")
+      .get("/private/companies")
       .then((result) => {
         const allCompanies = result.data;
         setAllCompanies(allCompanies);
