@@ -7,6 +7,7 @@ import { Company } from "../types/types";
 import Button from "../components/Button";
 import ReportIcon from "../components/ReportIcon";
 import SearchInput from "../components/SearchInput";
+import Header2 from "../components/Header2";
 
 // TODO: 企業一覧表示にページング機能を追加する
 const Home = () => {
@@ -100,6 +101,7 @@ const Home = () => {
 
   return (
     <>
+      {/* <Header2 /> */}
       <div className="flex justify-center mb-8">
         <SearchInput
           value={companyName}

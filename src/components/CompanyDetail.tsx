@@ -340,74 +340,72 @@ const CompanyDetail = () => {
   };
 
   return (
-    <div className="mb-20">
-      <div className="fixed bottom-0 py-6 w-[85%] bg-white z-10 flex justify-between">
+    <>
+      <div className="fixed left-0 top-0 pt-10 pb-4 px-[10%] w-full z-10 flex justify-between">
         <Button label="戻る" className="border-[1px]" onClick={goBack} />
         {!showAllData && (
-          <Button
-            label="全データを見る"
-            className="border-[1px]"
-            onClick={goToAll}
-          />
+          <Button label="全データ" className="border-[1px]" onClick={goToAll} />
         )}
       </div>
-      <Suspense fallback={<div>Loading...</div>}>
-        {!showAllData && (
-          <div className="w-fit mx-auto mt-4">
-            <DataTypeIcon text="最新データ" />
-          </div>
-        )}
-        <div className="mt-4 text-center">{company?.name}</div>
-        <TitleMarker title="比例縮尺図" />
-        <div className="xl:flex xl:justify-between sm:w-full xl:w-[50%]">
-          <div className="sm:flex sm:justify-center sm:w-full mx-auto xl:ml-[20%] xl:w-[600px]">
-            {/* 比例縮尺図コンポーネント */}
-            {ArrangedSummary(bsJsons, "BS")}
-            {ArrangedSummary(plJsons, "PL")}
+      <div className="mb-[200px]">
+        <Suspense fallback={<div>Loading...</div>}>
+          {!showAllData && (
+            <div className="w-fit mx-auto mt-4">
+              <DataTypeIcon text="最新データ" />
+            </div>
+          )}
+          <div className="mt-4 text-center">{company?.name}</div>
+          <TitleMarker title="比例縮尺図" />
+          <div className="xl:flex xl:justify-between sm:w-full xl:w-[50%]">
+            <div className="sm:flex sm:justify-center sm:w-full mx-auto xl:ml-[20%] xl:w-[600px]">
+              {/* 比例縮尺図コンポーネント */}
+              {ArrangedSummary(bsJsons, "BS")}
+              {ArrangedSummary(plJsons, "PL")}
+            </div>
+
+            <div>
+              {fundamentals && fundamentals.length > 0 && (
+                <div className="xl:mx-[30%]">
+                  {!hasOperatingRevenueAndCost && (
+                    // 売上高営業利益率
+                    <>
+                      <TitleMarker title="売上高営業利益率" />
+                      <SalesProfit
+                        fundamentals={fundamentals}
+                        unitStr={unitStr}
+                      />
+                    </>
+                  )}
+                  {/* 自己資本比率 */}
+                  <TitleMarker title="自己資本比率" />
+                  <Capital fundamentals={fundamentals} unitStr={unitStr} />
+                </div>
+              )}
+              {cfJsons && cfJsons.length > 0 && (
+                <div className="xl:mx-[30%]">
+                  {/* CF計算書 */}
+                  <TitleMarker title="CF計算書" />
+                  <CashFlow reportDataList={cfJsons} unitStr={cfUnitStr} />
+                </div>
+              )}
+            </div>
           </div>
 
-          <div>
-            {fundamentals && fundamentals.length > 0 && (
-              <div className="xl:mx-[30%]">
-                {!hasOperatingRevenueAndCost && (
-                  // 売上高営業利益率
-                  <>
-                    <TitleMarker title="売上高営業利益率" />
-                    <SalesProfit
-                      fundamentals={fundamentals}
-                      unitStr={unitStr}
-                    />
-                  </>
-                )}
-                {/* 自己資本比率 */}
-                <TitleMarker title="自己資本比率" />
-                <Capital fundamentals={fundamentals} unitStr={unitStr} />
-              </div>
-            )}
-            {cfJsons && cfJsons.length > 0 && (
-              <div className="xl:mx-[30%]">
-                {/* CF計算書 */}
-                <TitleMarker title="CF計算書" />
-                <CashFlow reportDataList={cfJsons} unitStr={cfUnitStr} />
-              </div>
-            )}
+          {/* dangerouslySetInnerHTML を使って HTML をレンダリング */}
+          <div className="xl:flex">
+            {/* 貸借対照表 */}
+            <TitleMarker title="貸借対照表" />
+            {ArrangedHtml(bsHtmls, latestBsHtml)}
+            {/* 損益計算書 */}
+            <TitleMarker title="損益計算書" />
+            {ArrangedHtml(plHtmls, latestPlHtml)}
+            {/* CF計算書 */}
+            <TitleMarker title="キャッシュ・フロー計算書" />
+            {ArrangedHtml(cfHtmls, latestCfHtml)}
           </div>
-        </div>
-
-        {/* dangerouslySetInnerHTML を使って HTML をレンダリング */}
-        <div className="xl:flex">
-          {/* 貸借対照表 */}
-          <TitleMarker title="貸借対照表" />
-          {ArrangedHtml(bsHtmls, latestBsHtml)}
-          {/* 損益計算書 */}
-          <TitleMarker title="損益計算書" />
-          {ArrangedHtml(plHtmls, latestPlHtml)}
-          {/* CF計算書 */}
-          <TitleMarker title="キャッシュ・フロー計算書" />
-          {ArrangedHtml(cfHtmls, latestCfHtml)}
-        </div>
-      </Suspense>
-    </div>
+        </Suspense>
+      </div>
+    </>
   );
 };
 
