@@ -1,6 +1,6 @@
 export default function Header2() {
   return (
-    <header className="fixed top-0 left-0 h-[56px] w-full z-10 bg-white">
+    <header className="fixed top-0 left-0 h-[50px] w-full z-10 bg-green-300">
       <nav
         className="relative mx-auto flex justify-between"
         aria-label="Global"
@@ -8,7 +8,7 @@ export default function Header2() {
         <div className="flex lg:flex-1">
           <a
             href="/"
-            className="fixed top-2 left-4 rounded-lg p-1 hover:bg-gray-200"
+            className="fixed h-[50px] top-0 left-0 rounded-lg p-2 hover:bg-green-200"
           >
             <img
               src={`${process.env.PUBLIC_URL}/compass-square.png`}
