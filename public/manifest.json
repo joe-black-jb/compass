@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Compass",
+  "name": "財務諸表データ検索アプリ",
   "icons": [
     {
       "src": "favicon.ico",
@@ -8,12 +8,12 @@
       "type": "image/x-icon"
     },
     {
-      "src": "compass-logo.png",
+      "src": "compass-circle-green-300.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "compass-logo.png",
+      "src": "compass-circle-green-300.png",
       "type": "image/png",
       "sizes": "512x512"
     }

@@ -120,7 +120,7 @@ export default function Header(props: Props) {
           <a href="/" className="-m-1.5 p-1.5">
             <span className="sr-only">Your Company</span>
             <img
-              src={`${process.env.PUBLIC_URL}/compass-logo.png`}
+              src={`${process.env.PUBLIC_URL}/compass-circle-green-300.png`}
               className="w-6 h-6"
               alt="Logo"
             />
