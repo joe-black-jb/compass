@@ -33,6 +33,8 @@ import NoSummary from "./NoSummary";
 import SummaryTitle from "./SummaryTitle";
 import DisclosureSummary from "./DisclosureSummary";
 import DataTypeIcon from "./DataTypeIcon";
+import HomeIcon from "./HomeIcon";
+import GoBackIcon from "./GoBackIcon";
 
 const CompanyDetail = () => {
   const navigate = useNavigate();
@@ -339,13 +341,19 @@ const CompanyDetail = () => {
     navigate(`/company/${companyId}/all`);
   };
 
+  const goHome = () => {
+    navigate("/");
+  };
+
   return (
     <>
       <div className="fixed left-0 top-10 pt-10 pb-4 px-[10%] w-full z-10 flex justify-between">
-        <Button label="戻る" className="border-[1px]" onClick={goBack} />
-        {!showAllData && (
-          <Button label="全データ" className="border-[1px]" onClick={goToAll} />
+        {showAllData ? (
+          <GoBackIcon onClick={goBack} />
+        ) : (
+          <HomeIcon onClick={goHome} />
         )}
+        {!showAllData && <Button label="All" onClick={goToAll} />}
       </div>
       <div className="mb-[200px]">
         <Suspense fallback={<div>Loading...</div>}>

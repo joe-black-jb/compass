@@ -57,28 +57,16 @@ const Home = () => {
     setCompanyName(input);
   };
 
-  const filterCompanies = debounce((input: string) => {
+  const filterCompanies = (input: string) => {
     const filtered = allCompanies.filter(
       (company) => company.name.indexOf(input) !== -1 // 部分一致でフィルタリング
     );
-    // setCompanies(filtered);
-  }, 1000);
+    setSearchedCompanies(filtered);
+  };
 
   const handleSearch = () => {
     if (companyName) {
-      api
-        .get("/private/search", {
-          params: {
-            companyName,
-          },
-        })
-        .then((res) => {
-          const companies = res.data;
-          if (companies && companies.length > 0) {
-            setSearchedCompanies(companies);
-          }
-          // console.log(`「${companyName}」で検索した結果: ${res.data}`);
-        });
+      filterCompanies(companyName);
     } else {
       setCompanyName("");
       setSearchedCompanies([]);
@@ -91,8 +79,6 @@ const Home = () => {
       handleSearch();
     }
   };
-
-  // console.log("companies[0]: ", companies[0]);
 
   const displayCompanies =
     searchedCompanies && searchedCompanies.length > 0
