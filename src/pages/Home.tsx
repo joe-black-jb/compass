@@ -95,7 +95,7 @@ const Home = () => {
         />
       </div>
       <div className="bg-gray-200 text-gray-700 font-bold border-b border-gray-700 pl-2 py-2">
-        企業名
+        企業名 (先頭50社)
       </div>
       {isLoaded ? (
         <div className="relative overflow-x-auto  max-h-[600px]">
