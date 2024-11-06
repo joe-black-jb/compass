@@ -1,18 +1,15 @@
-import { Suspense, useEffect, useState } from "react";
-import { debounce } from "lodash";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import api from "../api/axiosConfig";
 import { Company } from "../types/types";
-import Button from "../components/Button";
-import ReportIcon from "../components/ReportIcon";
 import SearchInput from "../components/SearchInput";
-import Header2 from "../components/Header2";
+import LoadingIcon from "../components/LoadingIcon";
 
-// TODO: 企業一覧表示にページング機能を追加する
 const Home = () => {
   // UIに表示する企業データ
   const [companies, setCompanies] = useState<Company[]>([]);
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
   // 検索結果
   const [searchedCompanies, setSearchedCompanies] = useState<Company[]>([]);
   // 検索処理などで使用する企業データ
@@ -34,6 +31,7 @@ const Home = () => {
       .then((result) => {
         const companies = result.data;
         setCompanies(companies);
+        setIsLoaded(true);
       })
       .catch((e) => {
         console.log("エラー: ", e);
@@ -96,10 +94,10 @@ const Home = () => {
           onKeyDown={handleKeyDown}
         />
       </div>
-      <Suspense fallback={<div>Loading...</div>}>
-        <div className="bg-gray-200 text-gray-700 font-bold border-b border-gray-700 pl-2 py-2">
-          企業名
-        </div>
+      <div className="bg-gray-200 text-gray-700 font-bold border-b border-gray-700 pl-2 py-2">
+        企業名
+      </div>
+      {isLoaded ? (
         <div className="relative overflow-x-auto  max-h-[600px]">
           <table className="w-full text-sm text-left text-gray-700">
             {displayCompanies?.length > 0 &&
@@ -135,7 +133,11 @@ const Home = () => {
               })}
           </table>
         </div>
-      </Suspense>
+      ) : (
+        <div className="flex justify-center mt-20">
+          <LoadingIcon />
+        </div>
+      )}
     </>
   );
 };
