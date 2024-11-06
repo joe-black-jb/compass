@@ -69,6 +69,12 @@ const Chart = (props: Props) => {
               tickFormatter={formatRate}
             />
             <Tooltip
+              contentStyle={{
+                width: "fit-content",
+                height: "fit-content",
+                fontSize: 12,
+              }}
+              position={{ y: 100 }}
               formatter={(value, name) => {
                 if (name === SALES)
                   return getChartWindowStrs(SALES, value, unitStr);
@@ -190,12 +196,21 @@ const Chart = (props: Props) => {
                   yAxisId="left"
                   barSize={barSize}
                 />
-                <Bar
+                {/* フリーCF (棒グラフ) */}
+                {/* <Bar
                   name={FREE_CASH_FLOW}
                   dataKey="freeCf"
                   fill={orange}
                   yAxisId="left"
                   barSize={barSize}
+                /> */}
+                {/* フリーCF (折れ線グラフ) */}
+                <Line
+                  name={FREE_CASH_FLOW}
+                  type="linear"
+                  dataKey="freeCf"
+                  yAxisId="left"
+                  stroke={orange}
                 />
               </>
             )}
