@@ -35,6 +35,7 @@ import DisclosureSummary from "./DisclosureSummary";
 import DataTypeIcon from "./DataTypeIcon";
 import HomeIcon from "./HomeIcon";
 import GoBackIcon from "./GoBackIcon";
+import GoToTopButton from "./GoToTopButton";
 
 const CompanyDetail = () => {
   const navigate = useNavigate();
@@ -76,9 +77,24 @@ const CompanyDetail = () => {
 
   const [unitStr, setUnitStr] = useState<string>("");
 
+  // Topに戻るボタン
+  const [goToTopVisile, setGoToTopVisible] = useState<boolean>(false);
+
+  // トップに戻るボタンの表示を制御する
+  const toggleVisibility = () => {
+    if (window.scrollY > 300) {
+      setGoToTopVisible(true);
+    } else {
+      setGoToTopVisible(false);
+    }
+  };
+
   useEffect(() => {
     getCompany();
     // authenticateUser();
+
+    window.addEventListener("scroll", toggleVisibility);
+    return () => window.removeEventListener("scroll", toggleVisibility);
   }, []);
 
   useEffect(() => {
@@ -346,6 +362,13 @@ const CompanyDetail = () => {
     navigate("/");
   };
 
+  const goToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth", // スムーズにスクロール
+    });
+  };
+
   return (
     <>
       {/* <div className="fixed left-0 top-10 pt-8 pb-4 px-[10%] w-full flex justify-between"></div> */}
@@ -420,6 +443,11 @@ const CompanyDetail = () => {
               {ArrangedHtml(cfHtmls, latestCfHtml)}
             </div>
           </div>
+          {goToTopVisile && (
+            <div className="fixed bottom-10 right-10">
+              <GoToTopButton onClick={goToTop} />
+            </div>
+          )}
         </Suspense>
       </div>
     </>
