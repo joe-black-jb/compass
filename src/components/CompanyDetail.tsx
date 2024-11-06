@@ -348,13 +348,17 @@ const CompanyDetail = () => {
 
   return (
     <>
-      <div className="fixed left-0 top-10 pt-10 pb-4 px-[10%] w-full z-10 flex justify-between">
+      <div className="fixed left-0 top-10 pt-8 pb-4 px-[10%] w-full z-10 flex justify-between">
         {showAllData ? (
           <GoBackIcon onClick={goBack} />
         ) : (
           <HomeIcon onClick={goHome} />
         )}
-        {!showAllData && <Button label="All" onClick={goToAll} />}
+        {!showAllData && (
+          <div className="p-2">
+            <Button label="All" onClick={goToAll} />
+          </div>
+        )}
       </div>
       <div className="mb-[200px]">
         <Suspense fallback={<div>Loading...</div>}>
