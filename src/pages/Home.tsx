@@ -12,6 +12,7 @@ const Home = () => {
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
   // 検索結果
   const [searchedCompanies, setSearchedCompanies] = useState<Company[]>([]);
+  const [isSearched, setIsSearched] = useState<boolean>(false);
   // 検索処理などで使用する企業データ
   const [allCompanies, setAllCompanies] = useState<Company[]>([]);
   const [companyName, setCompanyName] = useState<string>("");
@@ -65,8 +66,10 @@ const Home = () => {
   const handleSearch = () => {
     if (companyName) {
       filterCompanies(companyName);
+      setIsSearched(true);
     } else {
       setCompanyName("");
+      setIsSearched(false);
       setSearchedCompanies([]);
     }
   };
@@ -83,16 +86,64 @@ const Home = () => {
       ? searchedCompanies
       : companies;
 
+  const ArrangedCompanyTable = () => {
+    if (isSearched && searchedCompanies.length === 0) {
+      return (
+        <tbody>
+          <tr className="border-b border-gray-700">
+            <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+              <div className="flex justify-between items-center text-red-500">
+                該当する企業がありませんでした
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      );
+    }
+    return displayCompanies?.map((company) => {
+      return (
+        <tbody key={company.id}>
+          <tr className="border-b border-gray-700">
+            <td
+              // scope="row"
+              className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
+            >
+              <div className="flex justify-between items-center">
+                <Link
+                  to={`company/${company.id}`}
+                  className="hover:text-blue-500 hover:underline"
+                >
+                  {company.name}
+                </Link>
+              </div>
+            </td>
+            {/* 資料 */}
+            {/* <td className="flex px-6 py-4">
+              {company.bs === 1 && (
+                <ReportIcon label="B/S" color="green" />
+              )}
+              {company.pl === 1 && (
+                <ReportIcon label="P/L" color="blue" />
+              )}
+            </td> */}
+          </tr>
+        </tbody>
+      );
+    });
+  };
+
   return (
     <>
       {/* <Header2 /> */}
       <div className="flex justify-center mb-8">
-        <SearchInput
-          value={companyName}
-          onChange={handleChangeCompanyName}
-          onClick={handleSearch}
-          onKeyDown={handleKeyDown}
-        />
+        <div>
+          <SearchInput
+            value={companyName}
+            onChange={handleChangeCompanyName}
+            onClick={handleSearch}
+            onKeyDown={handleKeyDown}
+          />
+        </div>
       </div>
       <div className="bg-gray-200 text-gray-700 font-bold border-b border-gray-700 pl-2 py-2">
         企業名 (先頭50社)
@@ -100,37 +151,7 @@ const Home = () => {
       {isLoaded ? (
         <div className="relative overflow-x-auto  max-h-[600px]">
           <table className="w-full text-sm text-left text-gray-700">
-            {displayCompanies?.length > 0 &&
-              displayCompanies.map((company) => {
-                return (
-                  <tbody key={company.id}>
-                    <tr className="border-b border-gray-700">
-                      <td
-                        // scope="row"
-                        className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
-                      >
-                        <div className="flex justify-between items-center">
-                          <Link
-                            to={`company/${company.id}`}
-                            className="hover:text-blue-500 hover:underline"
-                          >
-                            {company.name}
-                          </Link>
-                        </div>
-                      </td>
-                      {/* 資料 */}
-                      {/* <td className="flex px-6 py-4">
-                        {company.bs === 1 && (
-                          <ReportIcon label="B/S" color="green" />
-                        )}
-                        {company.pl === 1 && (
-                          <ReportIcon label="P/L" color="blue" />
-                        )}
-                      </td> */}
-                    </tr>
-                  </tbody>
-                );
-              })}
+            {ArrangedCompanyTable()}
           </table>
         </div>
       ) : (
