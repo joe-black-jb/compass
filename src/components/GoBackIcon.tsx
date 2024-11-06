@@ -8,10 +8,10 @@ interface Props {
 const GoBackIcon = (props: Props) => {
   const { onClick } = props;
   return (
-    <div className="bg-white hover:bg-green-100 mt-1 p-2 rounded-full">
+    <div className="w-fit bg-white hover:bg-green-100 mt-1 p-2 rounded-full">
       <ArrowUturnLeftIcon
         onClick={onClick}
-        className="size-6 h-full cursor-pointer"
+        className="size-5 h-full cursor-pointer"
       />
     </div>
   );

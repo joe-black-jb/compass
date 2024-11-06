@@ -348,22 +348,22 @@ const CompanyDetail = () => {
 
   return (
     <>
-      <div className="fixed left-0 top-10 pt-8 pb-4 px-[10%] w-full z-10 flex justify-between">
-        {showAllData ? (
-          <GoBackIcon onClick={goBack} />
-        ) : (
-          <HomeIcon onClick={goHome} />
-        )}
-        {!showAllData && (
-          <div className="p-2">
-            <Button label="All" onClick={goToAll} />
-          </div>
-        )}
-      </div>
+      {/* <div className="fixed left-0 top-10 pt-8 pb-4 px-[10%] w-full flex justify-between"></div> */}
       <div className="mb-[200px]">
         <Suspense fallback={<div>Loading...</div>}>
-          <div className="w-fit mx-auto mt-4">
+          <div className="w-full mt-4 flex justify-between items-center">
+            <div className="w-[50px]">
+              {showAllData ? (
+                <GoBackIcon onClick={goBack} />
+              ) : (
+                <HomeIcon onClick={goHome} />
+              )}
+            </div>
             <DataTypeIcon text={showAllData ? "全データ" : "最新データ"} />
+
+            <div className="p-2 w-[50px]">
+              {!showAllData && <Button label="All" onClick={goToAll} />}
+            </div>
           </div>
           <div className="mt-4 text-center">{company?.name}</div>
           <TitleMarker title="比例縮尺図" />
