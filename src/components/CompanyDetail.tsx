@@ -62,6 +62,7 @@ const CompanyDetail = () => {
   const [latestPlJson, setLatestPlJson] = useState<ReportData>();
   const [latestPlPeriodStart, setLatestPlPeriodStart] = useState<string>();
   const [latestPlPeriodEnd, setLatestPlPeriodEnd] = useState<string>();
+
   // CF
   const [cfHtmls, setCfHtmls] = useState<ReportDataWithPeriod[]>([]);
   const [latestCfHtml, setLatestCfHtml] = useState<ReportData>();
