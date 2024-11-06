@@ -53,7 +53,7 @@ const Chart = (props: Props) => {
   };
 
   return (
-    <div className="mb-10 xl:w-[600px] xl:ml-[10%]">
+    <div className="mb-10">
       <div className="flex justify-center">
         <ResponsiveContainer minWidth={350} width="100%" height={250}>
           <ComposedChart

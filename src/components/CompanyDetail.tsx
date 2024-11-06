@@ -354,8 +354,8 @@ const CompanyDetail = () => {
           </div>
           <div className="mt-4 text-center">{company?.name}</div>
           <TitleMarker title="比例縮尺図" />
-          <div className="xl:flex xl:justify-between sm:w-full xl:w-[50%]">
-            <div className="sm:flex sm:justify-center sm:w-full mx-auto xl:ml-[20%] xl:w-[600px]">
+          <div className="sm:w-full">
+            <div className="sm:flex sm:justify-center sm:w-full mx-auto">
               {/* 比例縮尺図コンポーネント */}
               {ArrangedSummary(bsJsons, "BS")}
               {ArrangedSummary(plJsons, "PL")}
@@ -363,7 +363,7 @@ const CompanyDetail = () => {
 
             <div>
               {fundamentals && fundamentals.length > 0 && (
-                <div className="xl:mx-[30%]">
+                <div>
                   {!hasOperatingRevenueAndCost && (
                     // 売上高営業利益率
                     <>
@@ -390,16 +390,22 @@ const CompanyDetail = () => {
           </div>
 
           {/* dangerouslySetInnerHTML を使って HTML をレンダリング */}
-          <div className="xl:flex">
-            {/* 貸借対照表 */}
-            <TitleMarker title="貸借対照表" />
-            {ArrangedHtml(bsHtmls, latestBsHtml)}
-            {/* 損益計算書 */}
-            <TitleMarker title="損益計算書" />
-            {ArrangedHtml(plHtmls, latestPlHtml)}
-            {/* CF計算書 */}
-            <TitleMarker title="キャッシュ・フロー計算書" />
-            {ArrangedHtml(cfHtmls, latestCfHtml)}
+          <div className="xl:flex xl:justify-between">
+            <div className="md:w-[70%] md:mx-auto xl:mx-0 xl:w-1/3 xl:px-10">
+              {/* 貸借対照表 */}
+              <TitleMarker title="貸借対照表" />
+              {ArrangedHtml(bsHtmls, latestBsHtml)}
+            </div>
+            <div className="md:w-[70%] md:mx-auto xl:mx-0 xl:w-1/3 xl:px-10">
+              {/* 損益計算書 */}
+              <TitleMarker title="損益計算書" />
+              {ArrangedHtml(plHtmls, latestPlHtml)}
+            </div>
+            <div className="md:w-[70%] md:mx-auto xl:mx-0 xl:w-1/3 xl:px-10">
+              {/* CF計算書 */}
+              <TitleMarker title="キャッシュ・フロー計算書" />
+              {ArrangedHtml(cfHtmls, latestCfHtml)}
+            </div>
           </div>
         </Suspense>
       </div>
