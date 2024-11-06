@@ -8,12 +8,12 @@
       "type": "image/x-icon"
     },
     {
-      "src": "compass-circle-green-300.png",
+      "src": "compass-circle-green.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "compass-circle-green-300.png",
+      "src": "compass-circle-green.png",
       "type": "image/png",
       "sizes": "512x512"
     }
