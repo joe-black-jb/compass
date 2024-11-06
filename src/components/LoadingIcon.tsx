@@ -1,5 +1,6 @@
 import React from "react";
 
+// https://flowbite.com/docs/components/spinner/
 const LoadingIcon = () => {
   return (
     <div role="status" className="w-fit">
