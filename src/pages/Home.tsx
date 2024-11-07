@@ -91,45 +91,32 @@ const Home = () => {
   const ArrangedCompanyTable = () => {
     if (isSearched && searchedCompanies.length === 0) {
       return (
-        <tbody>
-          <tr className="border-b-[1px] border-gray-400">
-            <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-              <div className="flex justify-between items-center text-red-500">
-                該当する企業がありませんでした
-              </div>
-            </td>
-          </tr>
-        </tbody>
+        <div className="border-b-[1px] border-gray-400">
+          <div className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+            <div className="flex justify-between items-center text-red-500">
+              該当する企業がありませんでした
+            </div>
+          </div>
+        </div>
       );
     }
     return displayCompanies?.map((company) => {
       return (
-        <tbody key={company.id}>
+        <div key={company.id}>
           <Link
             to={`company/${company.id}`}
             className="hover:bg-green-100 border-b-[1px] border-gray-400 block"
           >
-            <tr>
-              <td
-                // scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
-              >
-                <div className="flex justify-between items-center">
-                  {company.name}
-                </div>
-              </td>
-              {/* 資料 */}
-              {/* <td className="flex px-6 py-4">
-              {company.bs === 1 && (
-                <ReportIcon label="B/S" color="green" />
-              )}
-              {company.pl === 1 && (
-                <ReportIcon label="P/L" color="blue" />
-              )}
-            </td> */}
-            </tr>
+            <div
+              // scope="row"
+              className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
+            >
+              <div className="flex justify-between items-center">
+                {company.name}
+              </div>
+            </div>
           </Link>
-        </tbody>
+        </div>
       );
     });
   };
@@ -138,27 +125,27 @@ const Home = () => {
     <>
       {/* <Header2 /> */}
       <div className="flex justify-center mb-8">
-        <div>
-          <SearchInput
-            value={companyName}
-            onChange={handleChangeCompanyName}
-            onClick={handleSearch}
-            onKeyDown={handleKeyDown}
-          />
-        </div>
+        <SearchInput
+          value={companyName}
+          onChange={handleChangeCompanyName}
+          onClick={handleSearch}
+          onKeyDown={handleKeyDown}
+        />
       </div>
       <div className="lg:flex">
         {/* 企業一覧テーブル */}
         <div className="lg:w-[50%] lg:px-2">
           <div className="flex justify-start border-b-[1px] border-gray-400">
-            <TitleMarker title="企業名 (先頭50社)" />
+            <div className="lg:mb-6">
+              <TitleMarker title="企業名 (先頭50社)" />
+            </div>
           </div>
           <div className="border-b-[1px] border-gray-400">
             {isLoaded ? (
-              <div className="relative overflow-x-auto  max-h-[420px] lg:max-h-[750px]">
-                <table className="w-full text-sm text-left text-gray-700">
+              <div className="relative overflow-x-auto  max-h-[420px] lg:max-h-[1200px]">
+                <div className="w-full text-sm text-left text-gray-700">
                   {ArrangedCompanyTable()}
-                </table>
+                </div>
               </div>
             ) : (
               <div className="flex justify-center mt-20">

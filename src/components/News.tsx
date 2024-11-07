@@ -18,10 +18,10 @@ const News = () => {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1">
       {news?.news_list &&
         news.news_list.length > 0 &&
-        news.news_list.map((news) => <NewsCard news={news} />)}
+        news.news_list.map((news) => <NewsCard key={news.link} news={news} />)}
     </div>
   );
 };
