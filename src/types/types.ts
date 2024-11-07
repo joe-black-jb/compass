@@ -191,3 +191,14 @@ export type ChartTitle = "SalesProfit" | "Capital" | "CashFlow";
 export type ReportType = "BS" | "PL" | "CF";
 
 export type Sort = "asc" | "desc";
+
+export interface NewsData {
+  title: string;
+  summary: string;
+  link: string;
+}
+export interface NewsList {
+  news_list: NewsData[];
+  date_str: string;
+  am_pm: string;
+}

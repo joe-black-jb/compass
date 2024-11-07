@@ -5,6 +5,8 @@ import api from "../api/axiosConfig";
 import { Company } from "../types/types";
 import SearchInput from "../components/SearchInput";
 import LoadingIcon from "../components/LoadingIcon";
+import News from "../components/News";
+import TitleMarker from "../components/TitleMarker";
 
 const Home = () => {
   // UIに表示する企業データ
@@ -90,7 +92,7 @@ const Home = () => {
     if (isSearched && searchedCompanies.length === 0) {
       return (
         <tbody>
-          <tr className="border-b border-gray-700">
+          <tr className="border-b-[1px] border-gray-400">
             <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
               <div className="flex justify-between items-center text-red-500">
                 該当する企業がありませんでした
@@ -103,22 +105,21 @@ const Home = () => {
     return displayCompanies?.map((company) => {
       return (
         <tbody key={company.id}>
-          <tr className="border-b border-gray-700">
-            <td
-              // scope="row"
-              className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
-            >
-              <div className="flex justify-between items-center">
-                <Link
-                  to={`company/${company.id}`}
-                  className="hover:text-blue-500 hover:underline"
-                >
+          <Link
+            to={`company/${company.id}`}
+            className="hover:bg-green-100 border-b-[1px] border-gray-400 block"
+          >
+            <tr>
+              <td
+                // scope="row"
+                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
+              >
+                <div className="flex justify-between items-center">
                   {company.name}
-                </Link>
-              </div>
-            </td>
-            {/* 資料 */}
-            {/* <td className="flex px-6 py-4">
+                </div>
+              </td>
+              {/* 資料 */}
+              {/* <td className="flex px-6 py-4">
               {company.bs === 1 && (
                 <ReportIcon label="B/S" color="green" />
               )}
@@ -126,7 +127,8 @@ const Home = () => {
                 <ReportIcon label="P/L" color="blue" />
               )}
             </td> */}
-          </tr>
+            </tr>
+          </Link>
         </tbody>
       );
     });
@@ -145,20 +147,36 @@ const Home = () => {
           />
         </div>
       </div>
-      <div className="bg-gray-200 text-gray-700 font-bold border-b border-gray-700 pl-2 py-2">
-        企業名 (先頭50社)
+      <div className="lg:flex">
+        {/* 企業一覧テーブル */}
+        <div className="lg:w-[50%] lg:px-2">
+          <div className="flex justify-start border-b-[1px] border-gray-400">
+            <TitleMarker title="企業名 (先頭50社)" />
+          </div>
+          <div className="border-b-[1px] border-gray-400">
+            {isLoaded ? (
+              <div className="relative overflow-x-auto  max-h-[420px] lg:max-h-[750px]">
+                <table className="w-full text-sm text-left text-gray-700">
+                  {ArrangedCompanyTable()}
+                </table>
+              </div>
+            ) : (
+              <div className="flex justify-center mt-20">
+                <LoadingIcon />
+              </div>
+            )}
+          </div>
+        </div>
+        {/* ニュース */}
+        <div className="lg:w-[50%] lg:px-2">
+          <div className="flex justify-start mt-10 lg:mt-0">
+            <TitleMarker title="ニュース (日本経済新聞)" />
+          </div>
+          <div className="mb-20">
+            <News />
+          </div>
+        </div>
       </div>
-      {isLoaded ? (
-        <div className="relative overflow-x-auto  max-h-[600px]">
-          <table className="w-full text-sm text-left text-gray-700">
-            {ArrangedCompanyTable()}
-          </table>
-        </div>
-      ) : (
-        <div className="flex justify-center mt-20">
-          <LoadingIcon />
-        </div>
-      )}
     </>
   );
 };
