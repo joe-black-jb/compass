@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import api from "../api/axiosConfig";
 import { Company } from "../types/types";
 import SearchInput from "../components/SearchInput";
-import LoadingIcon from "../components/LoadingIcon";
 import News from "../components/News";
 import TitleMarker from "../components/TitleMarker";
 import { searchCompanies } from "../api/api";
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 
 const Home = () => {
   // UIに表示する企業データ
@@ -82,7 +82,6 @@ const Home = () => {
   const onClickSearch = async () => {
     if (companyName) {
       const companies = await searchCompanies(companyName);
-      console.log(`「${companyName}」で検索した結果: ${companies}`);
 
       setSearchedCompanies(companies);
       setIsSearched(true);
@@ -94,6 +93,12 @@ const Home = () => {
   const clearCompanies = () => {
     setSearchedCompanies([]);
     setIsSearched(false);
+    setIsLoaded(true);
+  };
+
+  const onClickCancel = () => {
+    clearCompanies();
+    setCompanyName("");
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -161,7 +166,7 @@ const Home = () => {
         <div className="border-b-[1px] border-gray-400">
           <div className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
             <div className="flex justify-between items-center">
-              調べたい企業名を入力してください
+              検索結果が表示されます
             </div>
           </div>
         </div>
@@ -191,43 +196,28 @@ const Home = () => {
       <div className="flex justify-center mb-4">
         <SearchInput
           value={companyName}
+          searchedCompanies={searchedCompanies}
+          isSearched={isSearched}
           onChange={handleChangeCompanyName}
           onClick={onClickSearch}
+          onClear={onClickCancel}
           onKeyDown={handleKeyDown}
         />
       </div>
       <div>
-        {/* 企業一覧テーブル */}
-        <div>
-          <div className="flex justify-start border-b-[1px] border-gray-400">
-            <div className="lg:mb-6">
-              <TitleMarker title="調べたい企業" />
+        <a href="/about" target="secret">
+          <div className="flex justify-end items-center">
+            <div className="text-blue-500 text-right hover:underline">
+              使い方が分からない場合
             </div>
+            <ArrowTopRightOnSquareIcon className="size-5 ml-1 text-blue-500" />
           </div>
-          <div>
-            {/* 企業一覧を取得する場合 */}
-            {/* {isLoaded ? (
-              <div className="relative overflow-x-auto  max-h-[420px] lg:max-h-[1200px]">
-                <div className="w-full text-sm text-left text-gray-700">
-                  {SearchedCompanies()}
-                </div>
-              </div>
-            ) : (
-              <div className="flex justify-center mt-20">
-                <LoadingIcon />
-              </div>
-            )} */}
-
-            <div className="relative overflow-x-auto  max-h-[420px] lg:max-h-[1200px]">
-              <div className="w-full text-sm text-left text-gray-700">
-                {SearchedCompanies()}
-              </div>
-            </div>
-          </div>
-        </div>
+        </a>
+      </div>
+      <div>
         {/* ニュース */}
         <div>
-          <div className="flex justify-start mt-10">
+          <div className="flex justify-start">
             <TitleMarker title="ニュース (日本経済新聞)" />
           </div>
           <div className="mb-20">
