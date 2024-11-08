@@ -10,6 +10,8 @@ import RegisterUser from "./pages/RegisterUser";
 import { getJwtFromCookie, getUsernameFromCookie } from "./utils/funcs";
 import { authUser } from "./utils/apis";
 import Header2 from "./components/Header2";
+import Header from "./components/Header";
+import Compare from "./components/Compare";
 
 function App() {
   useEffect(() => {
@@ -34,13 +36,15 @@ function App() {
   };
   return (
     <>
-      <Header2 />
+      {/* <Header2 /> */}
+      <Header />
       <div className="mt-20 mx-8 sm:mx-16">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<RegisterUser />} />
           <Route path="/about" element={<About />} />
+          <Route path="/company/compare" element={<Compare />} />
           <Route
             path="/company/:companyId/title/:titleId/edit"
             element={<CompanyTitleEdit />}
