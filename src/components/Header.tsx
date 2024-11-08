@@ -73,7 +73,11 @@ export default function Header() {
               <div>
                 <>
                   {headerList.map((item) => (
-                    <HeaderListItem title={item.title} link={item.link} />
+                    <HeaderListItem
+                      key={item.link}
+                      title={item.title}
+                      link={item.link}
+                    />
                   ))}
                 </>
               </div>
