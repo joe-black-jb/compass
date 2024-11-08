@@ -20,11 +20,11 @@ const SearchInput = (props: Props) => {
         value={value}
         onChange={onChange}
         onKeyDown={onKeyDown}
-        className="rounded border-[1px] border-gray-500 py-2 px-2 w-[200px] md:w-[300px] lg:w-[400px]"
+        className="rounded border-[1px] border-gray-500 py-2 px-2 w-[250px] sm:w-[300px] lg:w-[400px]"
       />
       {/* <Button label="検索" className="border-[1px]" onClick={onClick} /> */}
       <div className="bg-green-200 h-full ml-1 hover:bg-green-100 rounded-lg">
-        <button className="h-full px-2">
+        <button onClick={onClick} className="h-full px-2">
           <MagnifyingGlassIcon className="size-6" />
         </button>
       </div>
