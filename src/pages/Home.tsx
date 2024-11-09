@@ -208,7 +208,7 @@ const Home = () => {
         <a href="/about" target="secret">
           <div className="flex justify-end items-center">
             <div className="text-blue-500 text-right hover:underline">
-              使い方が分からない場合
+              使い方を見る
             </div>
             <ArrowTopRightOnSquareIcon className="size-5 ml-1 text-blue-500" />
           </div>
