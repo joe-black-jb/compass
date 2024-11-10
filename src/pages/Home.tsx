@@ -209,14 +209,14 @@ const Home = () => {
         />
       </div>
       <div>
-        <a href="/about" target="secret">
-          <div className="flex justify-end items-center">
-            <div className="text-blue-500 text-right hover:underline">
+        <div className="flex justify-end items-center">
+          <a href="/about" target="secret" className="w-fit flex">
+            <div className="w-fit text-blue-500 text-right hover:underline">
               使い方を見る
             </div>
             <ArrowTopRightOnSquareIcon className="size-5 ml-1 text-blue-500" />
-          </div>
-        </a>
+          </a>
+        </div>
       </div>
       <div>
         {/* ニュース */}
