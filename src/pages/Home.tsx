@@ -16,6 +16,7 @@ const Home = () => {
   // 検索結果
   const [searchedCompanies, setSearchedCompanies] = useState<Company[]>([]);
   const [isSearched, setIsSearched] = useState<boolean>(false);
+  const [isSearching, setIsSearching] = useState<boolean>(false);
   // 検索処理などで使用する企業データ
   const [allCompanies, setAllCompanies] = useState<Company[]>([]);
   const [companyName, setCompanyName] = useState<string>("");
@@ -81,10 +82,12 @@ const Home = () => {
   // 検索にヒットした企業一覧を表示する場合
   const onClickSearch = async () => {
     if (companyName) {
+      setIsSearching(true);
       const companies = await searchCompanies(companyName);
 
       setSearchedCompanies(companies);
       setIsSearched(true);
+      setIsSearching(false);
     } else {
       clearCompanies();
     }
@@ -198,6 +201,7 @@ const Home = () => {
           value={companyName}
           searchedCompanies={searchedCompanies}
           isSearched={isSearched}
+          isSearching={isSearching}
           onChange={handleChangeCompanyName}
           onClick={onClickSearch}
           onClear={onClickCancel}

@@ -1,11 +1,13 @@
 import React from "react";
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Company } from "../types/types";
+import LoadingIcon from "./LoadingIcon";
 
 interface Props {
   value: string;
   searchedCompanies: Company[];
   isSearched: boolean;
+  isSearching: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onClick: () => void;
   onClear: () => void;
@@ -17,6 +19,7 @@ const SearchInput = (props: Props) => {
     value,
     searchedCompanies,
     isSearched,
+    isSearching,
     onChange,
     onClick,
     onClear,
@@ -24,6 +27,13 @@ const SearchInput = (props: Props) => {
   } = props;
 
   const ArrangedSearchedCompanies = () => {
+    if (isSearching) {
+      return (
+        <div className="bg-white p-2 flex justify-center items-center">
+          <LoadingIcon />
+        </div>
+      );
+    }
     if (isSearched && searchedCompanies && searchedCompanies.length > 0) {
       return (
         <>
