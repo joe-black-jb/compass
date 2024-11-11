@@ -416,7 +416,7 @@ const CompanyDetail = () => {
                 </div>
               )}
               {cfJsons && cfJsons.length > 0 && (
-                <div className="xl:mx-[30%]">
+                <div>
                   {/* CF計算書 */}
                   <TitleMarker title="CF計算書" />
                   <CashFlow reportDataList={cfJsons} unitStr={cfUnitStr} />
