@@ -533,10 +533,11 @@ const CompanyDetail = () => {
         ) : (
           <div className="mt-4 text-center">{company?.name}</div>
         )}
+
+        {/* 比例縮尺図 */}
         <TitleMarker title="比例縮尺図" />
         <div className="sm:w-full">
           <div className="sm:flex sm:justify-center sm:w-full mx-auto">
-            {/* 比例縮尺図コンポーネント */}
             {loading ? (
               <>
                 <SummaryTitleSkelton hasMargin={false} />
@@ -550,6 +551,7 @@ const CompanyDetail = () => {
             )}
           </div>
 
+          {/* その他指標 */}
           <div>
             <>
               <TitleMarker title="売上高営業利益率" />
@@ -566,7 +568,7 @@ const CompanyDetail = () => {
           </div>
         </div>
 
-        {/* dangerouslySetInnerHTML を使って HTML をレンダリング */}
+        {/* 財務三表 */}
         <div className="xl:flex xl:justify-between">
           <div className="md:w-[70%] md:mx-auto xl:mx-0 xl:w-1/3 xl:px-10">
             {/* 貸借対照表 */}
@@ -602,6 +604,7 @@ const CompanyDetail = () => {
             )}
           </div>
         </div>
+
         {goToTopVisile && (
           <div className="fixed bottom-10 right-10">
             <GoToTopButton onClick={goToTop} />
