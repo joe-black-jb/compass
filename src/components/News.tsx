@@ -18,10 +18,8 @@ const News = () => {
   const fetchLatestNews = async () => {
     const newsList = await getLatestNews();
     if (newsList) {
-      setTimeout(() => {
-        setNews(newsList);
-        setIsLoading(false);
-      }, 3000);
+      setNews(newsList);
+      setIsLoading(false);
     }
   };
 
