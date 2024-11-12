@@ -6,10 +6,18 @@ interface Props {
   periodEnd?: string;
   disablePeriod?: boolean;
   noData?: boolean;
+  isLoading?: boolean;
 }
 
 const SummaryTitle = (props: Props) => {
-  const { title, periodStart, periodEnd, disablePeriod, noData } = props;
+  const {
+    title,
+    periodStart,
+    periodEnd,
+    disablePeriod,
+    noData,
+    isLoading = false,
+  } = props;
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -18,6 +26,15 @@ const SummaryTitle = (props: Props) => {
   };
 
   const open = isOpen;
+
+  if (isLoading) {
+    return (
+      <div
+        className="relative bg-green-300 h-[56px] animate-pulse rounded-xl"
+        onClick={toggleSummary}
+      ></div>
+    );
+  }
 
   return (
     <div
@@ -49,7 +66,9 @@ const SummaryTitle = (props: Props) => {
       {!periodStart && !periodEnd && !disablePeriod && (
         <div className="text-center">(該当期間なし)</div>
       )}
-      {noData && <div className="text-center">(該当データなし)</div>}
+      {noData && !isLoading && (
+        <div className="text-center">(該当データなし)</div>
+      )}
     </div>
   );
 };

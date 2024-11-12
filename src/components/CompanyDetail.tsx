@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import {
@@ -36,6 +36,9 @@ import DataTypeIcon from "./DataTypeIcon";
 import HomeIcon from "./HomeIcon";
 import GoBackIcon from "./GoBackIcon";
 import GoToTopButton from "./GoToTopButton";
+import SummaryTitleSkelton from "./SummaryTitleSkelton";
+import ChartSkelton from "./ChartSkelton";
+import OneLineSummaryTitleSkelton from "./OneLineSummaryTitleSkelton";
 
 const CompanyDetail = () => {
   const navigate = useNavigate();
@@ -48,30 +51,51 @@ const CompanyDetail = () => {
   const [company, setCompany] = useState<Company>();
   const { companyId } = useParams();
   const [admin, setAdmin] = useState<boolean>(false);
-  // BS
+
+  // BS (HTML)
   const [bsHtmls, setBsHtmls] = useState<ReportDataWithPeriod[]>([]);
   const [latestBsHtml, setLatestBsHtml] = useState<ReportData>();
+  const [bsHtmlsLoading, setBsHtmlsLoading] = useState<boolean>(true);
+  const [latestBsHtmlLoading, setLatestBsHtmlLoading] = useState<boolean>(true);
+
+  // BS (JSON)
   const [bsJsons, setBsJsons] = useState<ReportDataWithPeriod[]>([]);
   const [latestBsJson, setLatestBsJson] = useState<ReportData>();
+  const [bsJsonsLoading, setBsJsonsLoading] = useState<boolean>(true);
+  const [latestBsJsonLoading, setLatestBsJsonLoading] = useState<boolean>(true);
   const [latestBsPeriodStart, setLatestBsPeriodStart] = useState<string>();
   const [latestBsPeriodEnd, setLatestBsPeriodEnd] = useState<string>();
 
-  // PL
+  // PL (HTML)
   const [plHtmls, setPlHtmls] = useState<ReportDataWithPeriod[]>([]);
   const [latestPlHtml, setLatestPlHtml] = useState<ReportData>();
+  const [plHtmlsLoading, setPlHtmlsLoading] = useState<boolean>(true);
+  const [latestPlHtmlLoading, setLatestPlHtmlLoading] = useState<boolean>(true);
+
+  // PL (JSON)
   const [plJsons, setPlJsons] = useState<ReportDataWithPeriod[]>([]);
   const [latestPlJson, setLatestPlJson] = useState<ReportData>();
+  const [plJsonsLoading, setPlJsonsLoading] = useState<boolean>(true);
+  const [latestPlJsonLoading, setLatestPlJsonLoading] = useState<boolean>(true);
   const [latestPlPeriodStart, setLatestPlPeriodStart] = useState<string>();
   const [latestPlPeriodEnd, setLatestPlPeriodEnd] = useState<string>();
 
-  // CF
+  // CF (HTML)
   const [cfHtmls, setCfHtmls] = useState<ReportDataWithPeriod[]>([]);
   const [latestCfHtml, setLatestCfHtml] = useState<ReportData>();
+  const [cfHtmlsLoading, setCfHtmlsLoading] = useState<boolean>(true);
+  const [latestCfHtmlLoading, setLatestCfHtmlLoading] = useState<boolean>(true);
+
+  // CF (JSON)
   const [cfJsons, setCfJsons] = useState<ReportDataWithPeriod[]>([]);
   const [latestCfJson, setLatestCfJson] = useState<ReportData>();
+  const [cfJsonsLoading, setCfJsonsLoading] = useState<boolean>(true);
+  const [latestCfJsonLoading, setLatestCfJsonLoading] = useState<boolean>(true);
   const [cfUnitStr, setCfUnitStr] = useState<string>("");
-  // Fundamental
+
+  // Fundamental (only JSON)
   const [fundamentals, setFundamentals] = useState<Fundamental[]>([]);
+  const [fundamentalsLoading, setFundamentalsLoading] = useState<boolean>(true);
   const [hasOperatingRevenueAndCost, setHasOperatingRevenueAndCost] =
     useState<boolean>(false);
 
@@ -90,6 +114,7 @@ const CompanyDetail = () => {
   };
 
   useEffect(() => {
+    setBsHtmlsLoading(true);
     getCompany();
     // authenticateUser();
 
@@ -100,18 +125,75 @@ const CompanyDetail = () => {
   useEffect(() => {
     if (company) {
       // BS
-      getHtmlReports(company, "BS", setBsHtmls, setLatestBsHtml);
-      getJsonReports(company, "BS", setBsJsons, setLatestBsJson);
+      getHtmlReports(
+        company,
+        "BS",
+        setBsHtmls,
+        setLatestBsHtml,
+        setBsHtmlsLoading,
+        setLatestBsHtmlLoading
+      );
+      getJsonReports(
+        company,
+        "BS",
+        setBsJsons,
+        setLatestBsJson,
+        setBsJsonsLoading,
+        setLatestBsJsonLoading
+      );
       // PL
-      getHtmlReports(company, "PL", setPlHtmls, setLatestPlHtml);
-      getJsonReports(company, "PL", setPlJsons, setLatestPlJson);
+      getHtmlReports(
+        company,
+        "PL",
+        setPlHtmls,
+        setLatestPlHtml,
+        setPlHtmlsLoading,
+        setLatestPlHtmlLoading
+      );
+      getJsonReports(
+        company,
+        "PL",
+        setPlJsons,
+        setLatestPlJson,
+        setPlJsonsLoading,
+        setLatestPlJsonLoading
+      );
       // CF
-      getHtmlReports(company, "CF", setCfHtmls, setLatestCfHtml);
-      getJsonReports(company, "CF", setCfJsons, setLatestCfJson);
+      getHtmlReports(
+        company,
+        "CF",
+        setCfHtmls,
+        setLatestCfHtml,
+        setCfHtmlsLoading,
+        setLatestCfHtmlLoading
+      );
+      getJsonReports(
+        company,
+        "CF",
+        setCfJsons,
+        setLatestCfJson,
+        setCfJsonsLoading,
+        setLatestCfJsonLoading
+      );
       // Fundamental
       getFundamentals(company);
     }
   }, [company]);
+
+  const loading =
+    bsHtmlsLoading ||
+    latestBsHtmlLoading ||
+    bsJsonsLoading ||
+    latestBsJsonLoading ||
+    plHtmlsLoading ||
+    latestPlHtmlLoading ||
+    plJsonsLoading ||
+    latestPlJsonLoading ||
+    cfHtmlsLoading ||
+    latestCfHtmlLoading ||
+    cfJsonsLoading ||
+    latestCfJsonLoading ||
+    fundamentalsLoading;
 
   const getCompany = () => {
     api.get(`/private/company/${companyId}`).then((result: AxiosResponse) => {
@@ -125,7 +207,9 @@ const CompanyDetail = () => {
     company: Company,
     reportType: string,
     setAllCallback: (reports: ReportDataWithPeriod[]) => void,
-    setEachCallback: (report: ReportData) => void
+    setEachCallback: (report: ReportData) => void,
+    setAllLoading: (isAllLoading: boolean) => void,
+    setEachLoading: (isEachLoading: boolean) => void
   ) => {
     const result = await getReports(company, reportType, "html");
     // console.log(`${reportType} HTMLs: ${result} (${result.length} 件)`);
@@ -144,6 +228,8 @@ const CompanyDetail = () => {
         setEachCallback(latest);
       }
     }
+    setAllLoading(false);
+    setEachLoading(false);
   };
 
   const getJsonReports = async (
@@ -151,6 +237,8 @@ const CompanyDetail = () => {
     reportType: string,
     setAllCallback: (reports: ReportDataWithPeriod[]) => void,
     setEachCallback: (report: ReportData) => void,
+    setAllLoading: (isAllLoading: boolean) => void,
+    setEachLoading: (isEachLoading: boolean) => void,
     sort?: Sort
   ) => {
     const reports = await getReports(company, reportType, "json");
@@ -190,6 +278,8 @@ const CompanyDetail = () => {
         }
       }
     }
+    setAllLoading(false);
+    setEachLoading(false);
   };
 
   const getReports = async (
@@ -230,6 +320,7 @@ const CompanyDetail = () => {
           setHasOperatingRevenueAndCost(hasOperatingRevenueAndCost);
         }
       });
+    setFundamentalsLoading(false);
   };
 
   const authenticateUser = async () => {
@@ -252,6 +343,9 @@ const CompanyDetail = () => {
     reports: ReportDataWithPeriod[],
     reportType: ReportType
   ) => {
+    if (loading) {
+      return <SummaryTitleSkelton hasMargin={false} />;
+    }
     if (reports && reports.length >= 2 && showAllData) {
       return (
         <div className="block">
@@ -354,6 +448,50 @@ const CompanyDetail = () => {
     }
   };
 
+  const ArrangedSalesProfit = () => {
+    if (loading) {
+      return <ChartSkelton />;
+    }
+
+    if (
+      fundamentals &&
+      fundamentals.length > 0 &&
+      !hasOperatingRevenueAndCost
+    ) {
+      return <SalesProfit fundamentals={fundamentals} unitStr={unitStr} />;
+    }
+
+    return <ChartSkelton noData={true} />;
+  };
+
+  const ArrangedCapital = () => {
+    if (loading) {
+      return <ChartSkelton />;
+    }
+
+    if (
+      fundamentals &&
+      fundamentals.length > 0 &&
+      !hasOperatingRevenueAndCost
+    ) {
+      return <Capital fundamentals={fundamentals} unitStr={unitStr} />;
+    }
+
+    return <ChartSkelton noData={true} />;
+  };
+
+  const ArrangedCashFlow = () => {
+    if (loading) {
+      return <ChartSkelton />;
+    }
+
+    if (cfJsons && cfJsons.length) {
+      return <CashFlow reportDataList={cfJsons} unitStr={cfUnitStr} />;
+    }
+
+    return <ChartSkelton noData={true} />;
+  };
+
   const goToAll = () => {
     navigate(`/company/${companyId}/all`);
   };
@@ -373,82 +511,102 @@ const CompanyDetail = () => {
     <>
       {/* <div className="fixed left-0 top-10 pt-8 pb-4 px-[10%] w-full flex justify-between"></div> */}
       <div className="mb-[200px]">
-        <Suspense fallback={<div>Loading...</div>}>
-          <div className="w-full mt-4 flex justify-between items-center">
-            <div className="w-[50px]">
-              {showAllData ? (
-                <GoBackIcon onClick={goBack} />
-              ) : (
-                <HomeIcon onClick={goHome} />
-              )}
-            </div>
-            <DataTypeIcon text={showAllData ? "全データ" : "最新データ"} />
-
-            <div className="p-2 w-[50px]">
-              {!showAllData && <Button label="All" onClick={goToAll} />}
-            </div>
+        <div className="w-full mt-4 flex justify-between items-center">
+          <div className="w-[50px]">
+            {showAllData ? (
+              <GoBackIcon onClick={goBack} />
+            ) : (
+              <HomeIcon onClick={goHome} />
+            )}
           </div>
+          <DataTypeIcon text={showAllData ? "全データ" : "最新データ"} />
+
+          <div className="p-2 w-[50px]">
+            {!showAllData && <Button label="All" onClick={goToAll} />}
+          </div>
+        </div>
+        {/* 企業名 */}
+        {loading ? (
+          <div className="flex justify-center items-center">
+            <div className="mt-4 text-center bg-gray-100 rounded-lg animate-pulse w-[200px] h-[24px]"></div>
+          </div>
+        ) : (
           <div className="mt-4 text-center">{company?.name}</div>
-          <TitleMarker title="比例縮尺図" />
-          <div className="sm:w-full">
-            <div className="sm:flex sm:justify-center sm:w-full mx-auto">
-              {/* 比例縮尺図コンポーネント */}
-              {ArrangedSummary(bsJsons, "BS")}
-              {ArrangedSummary(plJsons, "PL")}
-            </div>
-
-            <div>
-              {fundamentals && fundamentals.length > 0 && (
-                <div>
-                  {!hasOperatingRevenueAndCost && (
-                    // 売上高営業利益率
-                    <>
-                      <TitleMarker title="売上高営業利益率" />
-                      <SalesProfit
-                        fundamentals={fundamentals}
-                        unitStr={unitStr}
-                      />
-                    </>
-                  )}
-                  {/* 自己資本比率 */}
-                  <TitleMarker title="自己資本比率" />
-                  <Capital fundamentals={fundamentals} unitStr={unitStr} />
-                </div>
-              )}
-              {cfJsons && cfJsons.length > 0 && (
-                <div>
-                  {/* CF計算書 */}
-                  <TitleMarker title="CF計算書" />
-                  <CashFlow reportDataList={cfJsons} unitStr={cfUnitStr} />
-                </div>
-              )}
-            </div>
+        )}
+        <TitleMarker title="比例縮尺図" />
+        <div className="sm:w-full">
+          <div className="sm:flex sm:justify-center sm:w-full mx-auto">
+            {/* 比例縮尺図コンポーネント */}
+            {loading ? (
+              <>
+                <SummaryTitleSkelton hasMargin={false} />
+                <SummaryTitleSkelton hasMargin={true} />
+              </>
+            ) : (
+              <>
+                {ArrangedSummary(bsJsons, "BS")}
+                {ArrangedSummary(plJsons, "PL")}
+              </>
+            )}
           </div>
 
-          {/* dangerouslySetInnerHTML を使って HTML をレンダリング */}
-          <div className="xl:flex xl:justify-between">
-            <div className="md:w-[70%] md:mx-auto xl:mx-0 xl:w-1/3 xl:px-10">
-              {/* 貸借対照表 */}
-              <TitleMarker title="貸借対照表" />
-              {ArrangedHtml(bsHtmls, latestBsHtml)}
-            </div>
-            <div className="md:w-[70%] md:mx-auto xl:mx-0 xl:w-1/3 xl:px-10">
-              {/* 損益計算書 */}
-              <TitleMarker title="損益計算書" />
-              {ArrangedHtml(plHtmls, latestPlHtml)}
-            </div>
-            <div className="md:w-[70%] md:mx-auto xl:mx-0 xl:w-1/3 xl:px-10">
-              {/* CF計算書 */}
-              <TitleMarker title="キャッシュ・フロー計算書" />
-              {ArrangedHtml(cfHtmls, latestCfHtml)}
-            </div>
+          <div>
+            <>
+              <TitleMarker title="売上高営業利益率" />
+              {ArrangedSalesProfit()}
+            </>
+            <>
+              <TitleMarker title="自己資本比率" />
+              {ArrangedCapital()}
+            </>
+            <>
+              <TitleMarker title="キャッシュフロー" />
+              {ArrangedCashFlow()}
+            </>
           </div>
-          {goToTopVisile && (
-            <div className="fixed bottom-10 right-10">
-              <GoToTopButton onClick={goToTop} />
-            </div>
-          )}
-        </Suspense>
+        </div>
+
+        {/* dangerouslySetInnerHTML を使って HTML をレンダリング */}
+        <div className="xl:flex xl:justify-between">
+          <div className="md:w-[70%] md:mx-auto xl:mx-0 xl:w-1/3 xl:px-10">
+            {/* 貸借対照表 */}
+            <TitleMarker title="貸借対照表" />
+            {loading ? (
+              <div className="mb-8">
+                <OneLineSummaryTitleSkelton />
+              </div>
+            ) : (
+              ArrangedHtml(bsHtmls, latestBsHtml)
+            )}
+          </div>
+          <div className="md:w-[70%] md:mx-auto xl:mx-0 xl:w-1/3 xl:px-10">
+            {/* 損益計算書 */}
+            <TitleMarker title="損益計算書" />
+            {loading ? (
+              <div className="mb-8">
+                <OneLineSummaryTitleSkelton />
+              </div>
+            ) : (
+              ArrangedHtml(plHtmls, latestPlHtml)
+            )}
+          </div>
+          <div className="md:w-[70%] md:mx-auto xl:mx-0 xl:w-1/3 xl:px-10">
+            {/* CF計算書 */}
+            <TitleMarker title="キャッシュ・フロー計算書" />
+            {loading ? (
+              <div className="mb-8">
+                <OneLineSummaryTitleSkelton />
+              </div>
+            ) : (
+              ArrangedHtml(cfHtmls, latestCfHtml)
+            )}
+          </div>
+        </div>
+        {goToTopVisile && (
+          <div className="fixed bottom-10 right-10">
+            <GoToTopButton onClick={goToTop} />
+          </div>
+        )}
       </div>
     </>
   );
