@@ -20,6 +20,21 @@ const BsSummary = (props: Props) => {
   const { data } = reportData;
 
   const summary: BsJson = JSON.parse(data);
+  const invalid =
+    !summary.current_assets.previous &&
+    !summary.current_assets.current &&
+    !summary.current_liabilities.previous &&
+    !summary.current_liabilities.current &&
+    !summary.fixed_liabilities.previous &&
+    !summary.fixed_liabilities.current &&
+    !summary.intangible_assets.previous &&
+    !summary.intangible_assets.current &&
+    !summary.investments_and_other_assets.previous &&
+    !summary.investments_and_other_assets.current &&
+    !summary.net_assets.previous &&
+    !summary.net_assets.current &&
+    !summary.tangible_assets.previous &&
+    !summary.tangible_assets.current;
 
   const minRatio = 10;
   const singleLineRatio = 15;
@@ -179,13 +194,23 @@ const BsSummary = (props: Props) => {
     return (
       <SummaryTitle
         title="貸借対照表"
-        periodStart={periodStart}
-        periodEnd={periodEnd}
+        periodStart={invalid ? "" : periodStart}
+        periodEnd={invalid ? "" : periodEnd}
       />
     );
   };
 
   const MainEl = (): JSX.Element => {
+    if (invalid) {
+      return (
+        <>
+          <div className="mt-4">(単位：)</div>
+          <div className="h-[400px] bg-gray-300 flex justify-center items-center mt-2 w-full border-2 border-gray-600 rounded-2xl">
+            <div>No Data</div>
+          </div>
+        </>
+      );
+    }
     return (
       <>
         <div className="mt-4">(単位：{summary.unit_string})</div>
