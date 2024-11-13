@@ -29,6 +29,7 @@ import {
   orange,
   OWNED_CAPITAL_RATIO,
   SALES,
+  tickFontSize,
 } from "../constants/constants";
 import { getChartWindowStrs, shortenUnitStr } from "../utils/funcs";
 import { ChartTitle } from "../types/types";
@@ -61,18 +62,23 @@ const Chart = (props: Props) => {
             margin={{ left: chartMarginLeft, right: chartMarginRight }}
           >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="period" />
-            <YAxis yAxisId="left" tickFormatter={formatYAxis} />
+            <XAxis dataKey="period" tick={{ fontSize: tickFontSize }} />
+            <YAxis
+              yAxisId="left"
+              tickFormatter={formatYAxis}
+              tick={{ fontSize: tickFontSize }}
+            />
             <YAxis
               yAxisId="right"
               orientation="right"
               tickFormatter={formatRate}
+              tick={{ fontSize: tickFontSize }}
             />
             <Tooltip
               contentStyle={{
                 width: "fit-content",
                 height: "fit-content",
-                fontSize: 12,
+                fontSize: tickFontSize,
               }}
               position={{ y: 100 }}
               formatter={(value, name) => {
