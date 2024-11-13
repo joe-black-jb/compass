@@ -38,12 +38,11 @@ const SearchInput = (props: Props) => {
       return (
         <>
           {searchedCompanies.map((company) => (
-            <div
-              key={company.id}
-              className="bg-white hover:bg-green-100 p-2 cursor-pointer"
-            >
-              <a href={`/company/${company.id}`}>{company.name}</a>
-            </div>
+            <a href={`/company/${company.id}`} key={company.id}>
+              <div className="bg-white hover:bg-green-100 p-2 cursor-pointer">
+                {company.name}
+              </div>
+            </a>
           ))}
         </>
       );
