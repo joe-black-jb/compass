@@ -117,9 +117,9 @@ const PlSummary = (props: Props) => {
     }
   } else {
     right = sales;
-    // 営業利益がマイナスの場合、貸方に加算
+    // 営業利益がマイナスの場合、符号を反転させ、貸方に加算
     if (operatingProfit < 0) {
-      right += operatingProfit;
+      right += -operatingProfit;
     }
   }
 
