@@ -281,3 +281,8 @@ export const getReportsWithPeriod = (
 
   return result;
 };
+
+export const formatSecurityCode = (securityCode: string): string => {
+  // 47550 を 4755.T に変換する
+  return `${securityCode.slice(0, -1)}.T`;
+};

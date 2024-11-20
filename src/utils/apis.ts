@@ -2,8 +2,10 @@ import { AxiosError, AxiosResponse } from "axios";
 import api from "../api/axiosConfig";
 import {
   Company,
+  GetStockParams,
   Login,
   PostTitleBody,
+  StockItem,
   Title,
   UpdateTitleBody,
 } from "../types/types";
@@ -112,4 +114,17 @@ export const registerUser = async (
     return res.data;
   }
   return undefined;
+};
+
+export const getStocks = async (
+  params: GetStockParams
+): Promise<StockItem[]> => {
+  const result = await api.get("/stock", {
+    params: {
+      ticker: params.ticker,
+      period: params.period,
+      interval: params.interval,
+    },
+  });
+  return result?.data || [];
 };

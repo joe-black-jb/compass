@@ -19,6 +19,7 @@ export interface Company {
   id: string;
   name: string;
   edinetCode: string;
+  securityCode: string;
   bs: number;
   pl: number;
   createdAt: string;
@@ -186,7 +187,7 @@ export interface TitleValue {
   color?: string;
 }
 
-export type ChartTitle = "SalesProfit" | "Capital" | "CashFlow";
+export type ChartTitle = "SalesProfit" | "Capital" | "CashFlow" | "Stock";
 
 export type ReportType = "BS" | "PL" | "CF";
 
@@ -201,4 +202,36 @@ export interface NewsList {
   news_list: NewsData[];
   date_str: string;
   am_pm: string;
+}
+
+export interface StockItem {
+  datetime: Date;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  adjClose: number;
+  volume: number;
+}
+
+export interface GetStockParams {
+  ticker: string;
+  period: string;
+  interval: string;
+}
+
+export interface MinMax {
+  min: number;
+  max: number;
+}
+
+export interface StockChartData {
+  period: string[];
+  prices: number[][];
+}
+
+export interface PeriodOption {
+  title: string;
+  period: string;
+  interval: string;
 }

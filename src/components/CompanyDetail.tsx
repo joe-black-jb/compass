@@ -39,6 +39,7 @@ import GoToTopButton from "./GoToTopButton";
 import SummaryTitleSkelton from "./SummaryTitleSkelton";
 import ChartSkelton from "./ChartSkelton";
 import OneLineSummaryTitleSkelton from "./OneLineSummaryTitleSkelton";
+import Stock from "./Stock";
 
 const CompanyDetail = () => {
   const navigate = useNavigate();
@@ -533,6 +534,10 @@ const CompanyDetail = () => {
         ) : (
           <div className="mt-4 text-center">{company?.name}</div>
         )}
+
+        {/* 株価 */}
+        <TitleMarker title="株価" />
+        <Stock securityCode={company?.securityCode} />
 
         {/* 比例縮尺図 */}
         <TitleMarker title="比例縮尺図" />

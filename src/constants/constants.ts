@@ -20,3 +20,5 @@ export const OPERATING_CASH_FLOW = "営業キャッシュフロー";
 export const INVESTING_CASH_FLOW = "投資キャッシュフロー";
 export const FINANCING_CASH_FLOW = "財務キャッシュフロー";
 export const FREE_CASH_FLOW = "フリーキャッシュフロー";
+export const STOCK = "株価";
+export const ADJ_CLOSE = "調整後終値";
