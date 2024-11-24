@@ -1,7 +1,13 @@
 import ReactECharts from "echarts-for-react";
 import { EChartsOption } from "echarts";
 
-const StockChartSkelton = () => {
+interface Props {
+  noData?: boolean;
+}
+
+const StockChartSkelton = (props: Props) => {
+  const { noData } = props;
+
   const option: EChartsOption = {
     // title: {
     //   text: "株価",
@@ -20,6 +26,9 @@ const StockChartSkelton = () => {
     },
     xAxis: {
       data: ["", "", "", ""],
+      axisLine: {
+        show: false, // X軸の軸線を表示
+      },
     },
     yAxis: {
       type: "value",
@@ -58,7 +67,16 @@ const StockChartSkelton = () => {
       },
     ],
   };
-  return <ReactECharts option={option} />;
+  return (
+    <div className="relative">
+      <ReactECharts option={option} />
+      {noData && (
+        <div className="absolute top-0 w-full h-full flex justify-center items-center text-4xl text-gray-200">
+          No Data
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default StockChartSkelton;

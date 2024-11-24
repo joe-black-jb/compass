@@ -212,6 +212,8 @@ export interface StockItem {
   close: number;
   adjClose: number;
   volume: number;
+  ma25?: number;
+  ma75?: number;
 }
 
 export interface GetStockParams {
@@ -228,6 +230,7 @@ export interface MinMax {
 export interface StockChartData {
   period: string[];
   prices: number[][];
+  volumes: number[];
 }
 
 export interface PeriodOption {
@@ -235,3 +238,16 @@ export interface PeriodOption {
   period: string;
   interval: string;
 }
+
+export interface TooltipData {
+  index: number;
+  data: string;
+}
+
+export interface Option {
+  key: string;
+  title: string;
+  selected: boolean;
+}
+
+export type LineType = "line" | "candlestick";
