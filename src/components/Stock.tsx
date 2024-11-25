@@ -194,7 +194,6 @@ const Stock = (props: Props) => {
   ];
 
   const handleChangeLineOption = (key: string) => {
-    console.log("選択した LineType: ", key);
     setLineType(key as LineType);
   };
 

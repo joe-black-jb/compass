@@ -64,7 +64,8 @@ const StockChart = (props: Props) => {
         stockData.period.push(timeStr);
       } else {
         const year = date.getFullYear();
-        const month = date.getMonth();
+        // getMonth() は 0 始まりのため +1 する
+        const month = date.getMonth() + 1;
         const day = date.getDate();
         const timeStr = `${year}/${month}/${day}`;
         stockData.period.push(timeStr);
